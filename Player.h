@@ -9,4 +9,5 @@ class Player {
     Player();
     int** board();
     void printBoard();
+    void setShip();
 };
