@@ -14,9 +14,13 @@ void Game::start() {
 }
 
 void Game::setup() {
-  player1.setDestroyer(2, 2, 4, 2);
+  player1.setDestroyer(2, 2, 3, 2);
+  player1.setSubmarine(3, 3, 3, 5);
 
   player1.printBoard();
+
   player1.placeShip(player1.getDestroyer());
+  player1.placeShip(player1.getSubmarine());
+
   player1.printBoard();
 }

@@ -17,4 +17,12 @@ class Player {
     void placeShip(Ship ship);
     void setDestroyer(int startX, int startY, int endX, int endY);
     Ship getDestroyer();
+    void setSubmarine(int startX, int startY, int endX, int endY);
+    Ship getSubmarine();
+    void setCruiser(int startX, int startY, int endX, int endY);
+    Ship getCruiser();
+    void setBattleship(int startX, int startY, int endX, int endY);
+    Ship getBattleship();
+    void setAircraftCarrier(int startX, int startY, int endX, int endY);
+    Ship getAircraftCarrier();
 };
