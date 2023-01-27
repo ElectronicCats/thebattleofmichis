@@ -43,3 +43,11 @@ void Board::serialPrint() {
 
   Serial.println("");
 }
+
+void Board::placeShip(Ship ship) {
+  for (int row = ship.getStartX(); row <= ship.getEndX(); row++) {
+    for (int col = ship.getStartY(); col <= ship.getEndY(); col++) {
+      get[row][col] = 1;
+    }
+  }  
+}
