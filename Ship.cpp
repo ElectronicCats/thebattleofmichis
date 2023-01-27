@@ -5,6 +5,7 @@ void Ship::create(int startX, int startY, int endX, int endY) {
   this->startY = startY;
   this->endX = endX;
   this->endY = endY;
+  this->hits = 0;
 }
 
 void Ship::setStart(int x, int y) {
@@ -37,4 +38,21 @@ int Ship::getSize() {
   int sizeX = abs(endX - startX) + 1;
   int sizeY = abs(endY - startY) + 1;
   return sizeX * sizeY;
+}
+
+bool Ship::isHit(int x, int y) {
+  if (x >= startX && x <= endX && y >= startY && y <= endY) {
+    hits++;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+int Ship::getHits() {
+  return hits;
+}
+
+bool Ship::isSunken() {
+  return hits >= Ship::getSize();
 }
