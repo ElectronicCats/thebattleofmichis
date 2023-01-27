@@ -17,14 +17,15 @@ class Player {
     Player();
     int** board();
     void printBoard();
+
     void placeShip(Ship ship); // Place a ship on the board
     void addShip(Ship ship); // Add a ship to the stack of ships
     void hit(int x, int y);
+    bool isShipSunken(Ship ship);
+    int getSunkenShips();
 
     void setDestroyer(int startX, int startY, int endX, int endY);
     Ship getDestroyer();
-    int getDestroyerSize();
-    bool isDestroyerSunken();
 
     void setSubmarine(int startX, int startY, int endX, int endY);
     Ship getSubmarine();

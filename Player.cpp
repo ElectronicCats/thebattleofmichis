@@ -25,8 +25,23 @@ void Player::addShip(Ship ship) {
 
 void Player::hit(int x, int y) {
   for (auto ship : ships) {
-    ship.isHit(x, y);
+    if (ship.isHit(x, y)) {
+      Player::isShipSunken(ship);
+    }
   }
+}
+
+bool Player::isShipSunken(Ship ship) {
+  if (ship.isSunken()) {
+    this->sunkenShips++;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+int Player::getSunkenShips() {
+  return this->sunkenShips;
 }
 
 void Player::setDestroyer(int startX, int startY, int endX, int endY) {
@@ -36,14 +51,6 @@ void Player::setDestroyer(int startX, int startY, int endX, int endY) {
 
 Ship Player::getDestroyer() {
   return Player::destroyer;
-}
-
-int Player::getDestroyerSize() {
-  return Player::destroyer.getSize();
-}
-
-bool Player::isDestroyerSunken() {
-  return Player::destroyer.isSunken();
 }
 
 void Player::setSubmarine(int startX, int startY, int endX, int endY) {
