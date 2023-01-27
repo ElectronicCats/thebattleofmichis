@@ -3,10 +3,11 @@
 
 class Game {
   private:
-    Player player;
+    Player player1;
+    Player player2;
 
   public:
     Game();
     void start();
-    void printBoard(); // For debugging
+    void setup();
 };

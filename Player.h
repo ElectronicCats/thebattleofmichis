@@ -14,5 +14,7 @@ class Player {
     Player();
     int** board();
     void printBoard();
-    void setShip();
+    void placeShip(Ship ship);
+    void setDestroyer(int startX, int startY, int endX, int endY);
+    Ship getDestroyer();
 };

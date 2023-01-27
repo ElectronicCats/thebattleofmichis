@@ -5,12 +5,18 @@ Game::Game() {
 }
 
 void Game::start() {
+  Game::setup();
+
   for(;;) {
-    Game::printBoard();
+    // Logic game goes here
     delay(10000);
   }
 }
 
-void Game::printBoard() {
-  player.printBoard();
+void Game::setup() {
+  player1.setDestroyer(2, 2, 4, 2);
+
+  player1.printBoard();
+  player1.placeShip(player1.getDestroyer());
+  player1.printBoard();
 }

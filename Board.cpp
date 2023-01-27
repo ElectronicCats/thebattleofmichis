@@ -45,8 +45,8 @@ void Board::serialPrint() {
 }
 
 void Board::placeShip(Ship ship) {
-  for (int row = ship.getStartX(); row <= ship.getEndX(); row++) {
-    for (int col = ship.getStartY(); col <= ship.getEndY(); col++) {
+  for (int row = ship.getStartX(); row <= ship.getEndY(); row++) {
+    for (int col = ship.getStartY(); col <= ship.getEndX(); col++) {
       get[row][col] = 1;
     }
   }  
