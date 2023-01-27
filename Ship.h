@@ -13,4 +13,5 @@ class Ship {
     int getStartY();
     int getEndX();
     int getEndY();
+    int getSize();
 };

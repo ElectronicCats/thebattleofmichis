@@ -32,3 +32,9 @@ int Ship::getEndX() {
 int Ship::getEndY() {
   return endY;
 }
+
+int Ship::getSize() {
+  int sizeX = abs(endX - startX) + 1;
+  int sizeY = abs(endY - startY) + 1;
+  return sizeX * sizeY;
+}

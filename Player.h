@@ -9,6 +9,7 @@ class Player {
     Ship cruiser;         // 3x1
     Ship battleship;      // 4x1
     Ship aircraftCarrier; // 5x1
+    int sunkenShips;      // 5 when all ships are sunken
 
   public:
     Player();
@@ -25,4 +26,6 @@ class Player {
     Ship getBattleship();
     void setAircraftCarrier(int startX, int startY, int endX, int endY);
     Ship getAircraftCarrier();
+
+    int getDestroyerSize();
 };

@@ -3,7 +3,7 @@
 #define cols 10
 
 Player::Player() : playerBoard(rows, cols) {
-  
+  sunkenShips = 0;
 }
 
 int** Player::board() {
@@ -56,4 +56,8 @@ void Player::setAircraftCarrier(int startX, int startY, int endX, int endY) {
 
 Ship Player::getAircraftCarrier() {
   return Player::aircraftCarrier;
+}
+
+int Player::getDestroyerSize() {
+  return Player::destroyer.getSize();
 }
