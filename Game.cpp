@@ -14,13 +14,15 @@ void Game::start() {
 }
 
 void Game::setup() {
-  player1.setDestroyer("destroyer", 2, 2, 3, 2);
-  player1.setSubmarine("submarine", 3, 3, 3, 5);
+  player1.createShip("battleship", 5, 9, 9, 9);
+  player1.createShip("destroyer", 1, 6, 2, 6);
+  player1.createShip("submarine", 8, 2, 8, 4);
 
   player1.printBoard();
 
   player1.placeShip(player1.getDestroyer());
   player1.placeShip(player1.getSubmarine());
+  player1.placeShip(player1.getBattleship());
 
   player1.hit(2, 2);
   Serial.println("Submarine size: " + String(player1.getSubmarine().getSize()));

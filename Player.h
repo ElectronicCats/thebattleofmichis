@@ -23,6 +23,7 @@ class Player {
     void hit(int x, int y);
     bool isShipSunken(Ship ship);
     int getSunkenShips();
+    bool createShip(String name, int startX, int startY, int endX, int endY);
 
     void setDestroyer(String name, int startX, int startY, int endX, int endY);
     Ship getDestroyer();

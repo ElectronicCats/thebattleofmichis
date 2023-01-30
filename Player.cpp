@@ -26,9 +26,9 @@ void Player::addShip(Ship ship) {
 void Player::hit(int x, int y) {
   for (auto ship : ships) {
     if (ship.isHit(x, y)) {
-      Serial.println("Ship: " + String(ship.getName()));
       Player::isShipSunken(ship);
     }
+    Serial.println("Ship: " + String(ship.getName()));
   }
 }
 
@@ -43,6 +43,26 @@ bool Player::isShipSunken(Ship ship) {
 
 int Player::getSunkenShips() {
   return this->sunkenShips;
+}
+
+bool Player::createShip(String name, int startX, int startY, int endX, int endY) {
+  if (name == "destroyer") {
+    Player::destroyer.create(name, startX, startY, endX, endY);
+    Player::addShip(Player::destroyer);
+  } else if (name == "submarine") {
+    Player::submarine.create(name, startX, startY, endX, endY);
+    Player::addShip(Player::submarine);
+  } else if (name == "cruiser") {
+    Player::cruiser.create(name, startX, startY, endX, endY);
+    Player::addShip(Player::cruiser);  
+  } else if (name == "battleship") {
+    Player::battleship.create(name, startX, startY, endX, endY);
+    Player::addShip(Player::battleship);
+  } else if (name == "aircraftCarrier") {
+    Player::aircraftCarrier.create(name, startX, startY, endX, endY);
+    Player::addShip(Player::aircraftCarrier);  
+  }
+  return true;  
 }
 
 void Player::setDestroyer(String name, int startX, int startY, int endX, int endY) {
@@ -61,11 +81,6 @@ void Player::setSubmarine(String name, int startX, int startY, int endX, int end
 
 Ship Player::getSubmarine() {
   return Player::submarine;
-}
-
-void Player::setCruiser(String name, int startX, int startY, int endX, int endY) {
-  Player::cruiser.create(name, startX, startY, endX, endY);
-  Player::addShip(Player::cruiser);
 }
 
 Ship Player::getCruiser() {
