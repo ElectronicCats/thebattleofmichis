@@ -4,10 +4,9 @@ class Ship {
   private:
     int startX, startY, endX, endY;
     int hits;
-    String name;
 
   public:
-    void create(String name, int startX, int startY, int endX, int endY);
+    void create(int startX, int startY, int endX, int endY);
     String getName();
     int getStartX();
     int getStartY();
