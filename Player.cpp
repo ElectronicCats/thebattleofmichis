@@ -24,11 +24,11 @@ void Player::addShip(Ship ship) {
 }
 
 void Player::hit(int x, int y) {
-  for (auto ship : ships) {
+  for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
+      Serial.println("Ship: " + String(ship.getName()));
       Player::isShipSunken(ship);
     }
-    Serial.println("Ship: " + String(ship.getName()));
   }
 }
 

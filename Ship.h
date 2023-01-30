@@ -15,6 +15,7 @@ class Ship {
     int getEndY();
     int getSize();
     bool isHit(int x, int y);
+    void increaseHits();
     int getHits();
     bool isSunken();
 };
