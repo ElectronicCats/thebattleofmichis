@@ -24,18 +24,18 @@ class Player {
     bool isShipSunken(Ship ship);
     int getSunkenShips();
 
-    void setDestroyer(int startX, int startY, int endX, int endY);
+    void setDestroyer(String name, int startX, int startY, int endX, int endY);
     Ship getDestroyer();
 
-    void setSubmarine(int startX, int startY, int endX, int endY);
+    void setSubmarine(String name, int startX, int startY, int endX, int endY);
     Ship getSubmarine();
 
-    void setCruiser(int startX, int startY, int endX, int endY);
+    void setCruiser(String name, int startX, int startY, int endX, int endY);
     Ship getCruiser();
     
-    void setBattleship(int startX, int startY, int endX, int endY);
+    void setBattleship(String name, int startX, int startY, int endX, int endY);
     Ship getBattleship();
 
-    void setAircraftCarrier(int startX, int startY, int endX, int endY);
+    void setAircraftCarrier(String name, int startX, int startY, int endX, int endY);
     Ship getAircraftCarrier();
 };

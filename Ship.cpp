@@ -1,11 +1,20 @@
 #include "Ship.h"
 
-void Ship::create(int startX, int startY, int endX, int endY) {
+void Ship::create(String name, int startX, int startY, int endX, int endY) {
   this->startX = startX;
   this->startY = startY;
   this->endX = endX;
   this->endY = endY;
   this->hits = 0;
+  Ship::setName(name);
+}
+
+void Ship::setName(String name) {
+  this->name = name;
+}
+
+String Ship::getName() {
+  return this->name;
 }
 
 void Ship::setStart(int x, int y) {
