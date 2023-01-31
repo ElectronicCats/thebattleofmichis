@@ -33,10 +33,8 @@ int Ship::getSize() {
 bool Ship::isHit(int x, int y) {
   if (x - 1 >= startX && x - 1 <= endX && y - 1 >= startY && y - 1 <= endY) {
     hits++;
-    //Serial.println("Hit true, hits: " + String(this->hits));
     return true;
   } else {
-    //Serial.println("Hit false, hits: " + String(this->hits));
     return false;
   }
 }

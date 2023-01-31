@@ -27,6 +27,11 @@ void Player::hit(int x, int y) {
   for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
       Player::isShipSunken(ship);
+      this->playerBoard.setPixel(x, y, 3);
+    } else {
+      if (this->playerBoard.getPixel(x, y) != 3) {
+        this->playerBoard.setPixel(x, y, 2);
+      }
     }
   }
 }

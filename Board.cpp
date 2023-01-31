@@ -51,3 +51,11 @@ void Board::placeShip(Ship ship) {
     }
   }  
 }
+
+int Board::getPixel(int x, int y) {
+  return this->get[y - 1][x - 1];
+}
+
+void Board::setPixel(int x, int y, int value) {
+  this->get[y - 1][x - 1] = value;
+}
