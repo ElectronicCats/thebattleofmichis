@@ -7,7 +7,6 @@ class Ship {
 
   public:
     void create(int startX, int startY, int endX, int endY);
-    String getName();
     int getStartX();
     int getStartY();
     int getEndX();

@@ -11,14 +11,18 @@ int** Player::board() {
 }
 
 void Player::printBoard() {
-  playerBoard.serialPrint();
+  playerBoard.print();
 }
 
+/**
+  * Takes an object of type Ship and and change the values
+  * of the coordinates from zero to one on the board
+  */
 void Player::placeShip(Ship ship) {
   playerBoard.placeShip(ship);
 }
 
-// Add a ship to the stack
+// Add a ship to the list of ships
 void Player::addShip(Ship ship) {
   this->ships.push_back(ship);
 }
@@ -36,6 +40,10 @@ void Player::hit(int x, int y) {
   }
 }
 
+/**
+ * Increase the number of suken ships if the ship
+ * is suken
+ */
 bool Player::isShipSunken(Ship ship) {
   if (ship.isSunken()) {
     this->sunkenShips++;

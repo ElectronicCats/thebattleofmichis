@@ -1,3 +1,5 @@
 debug.cfg
 debug_custom.json
 esp32.svd
+/.vscode
+.null-ls_657739_Board.cpp

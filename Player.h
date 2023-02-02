@@ -14,7 +14,7 @@ class Player {
     void printBoard();
 
     void placeShip(Ship ship); // Place a ship on the board
-    void addShip(Ship ship); // Add a ship to the stack of ships
+    void addShip(Ship ship); // Add a ship to the list of ships
     void hit(int x, int y);
     bool isShipSunken(Ship ship); // Increase the number of sunken ships
     int getSunkenShips();
