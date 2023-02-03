@@ -58,10 +58,29 @@ int Player::getSunkenShips() {
 }
 
 bool Player::createShip(int startX, int startY, int endX, int endY) {
+  if (!Player::isValidShipCoordinates(startX, startY, endX, endY)) {
+    return false;
+  }
+
   Ship ship;
   ship.create(startX, startY, endX, endY);
   Player::addShip(ship);
   return true;  
+}
+
+bool Player::isValidShipCoordinates(int startX, int startY, int endX, int endY) {
+  // ship instead of &ship because it generates a copy of the ship and
+  // the isHit method won't increase the number of hits on the original ship
+  for (auto ship : this->ships) {
+    for (int i = startX; i <= endX; i++) {
+      for (int j = startY; j <= endY; j++) {
+        if (ship.isHit(i, j)) {
+          return false;
+        }
+      }
+    }
+  }
+  return true;
 }
 
 Ship Player::getShip(int arrayPosition) {
