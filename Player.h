@@ -19,6 +19,7 @@ class Player {
     bool isShipSunken(Ship ship); // Increase the number of sunken ships
     int getSunkenShips();
     bool createShip(int startX, int startY, int endX, int endY);
+    bool isValidShipCoordinates(int startX, int startY, int endX, int endY);
     Ship getShip(int arrayPosition);
     std::vector<Ship> getShipsList();
 };
