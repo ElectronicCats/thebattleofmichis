@@ -14,8 +14,14 @@ void Game::start() {
 }
 
 void Game::setup() {
-  player1.createShip(5, 8, 8, 8);
-  player1.createShip(1, 6, 2, 6);
+  // Created
+  Serial.println("Ship 1 created: " + String(player1.createShip(5, 8, 8, 8)));
+  // Created
+  Serial.println("Ship 2 created: " + String(player1.createShip(1, 6, 2, 6)));
+  // Not created
+  Serial.println("Ship 3 created: " + String(player1.createShip(1, 6, 2, 6)));
+  // Not created
+  Serial.println("Ship 4 created: " + String(player1.createShip(5, 8, 5, 9)));
   player1.printBoard();
 
   player1.placeShip(player1.getShip(0));
