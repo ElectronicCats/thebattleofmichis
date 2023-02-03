@@ -3,7 +3,7 @@
 #define cols 10
 
 Player::Player() : playerBoard(rows, cols) {
-  
+  sunkenShips = 0;
 }
 
 int** Player::board() {
@@ -11,49 +11,68 @@ int** Player::board() {
 }
 
 void Player::printBoard() {
-  playerBoard.serialPrint();
+  playerBoard.print();
 }
 
+/**
+  * Takes an object of type Ship and and change the values
+  * of the coordinates from zero to one on the board
+  */
 void Player::placeShip(Ship ship) {
   playerBoard.placeShip(ship);
 }
 
-void Player::setDestroyer(int startX, int startY, int endX, int endY) {
-  Player::destroyer.create(startX, startY, endX, endY);
+// Add a ship to the list of ships
+void Player::addShip(Ship ship) {
+  this->ships.push_back(ship);
 }
 
-Ship Player::getDestroyer() {
-  return Player::destroyer;
+void Player::hit(int x, int y) {
+  for (auto &ship : ships) {
+    if (ship.isHit(x, y)) {
+      Player::isShipSunken(ship);
+      this->playerBoard.setPixel(x, y, 3);
+    } else {
+      if (this->playerBoard.getPixel(x, y) != 3) {
+        this->playerBoard.setPixel(x, y, 2);
+      }
+    }
+  }
 }
 
-void Player::setSubmarine(int startX, int startY, int endX, int endY) {
-  Player::submarine.create(startX, startY, endX, endY);
+/**
+ * Increase the number of suken ships if the ship
+ * is suken
+ */
+bool Player::isShipSunken(Ship ship) {
+  if (ship.isSunken()) {
+    this->sunkenShips++;
+    return true;
+  } else {
+    return false;
+  }
 }
 
-Ship Player::getSubmarine() {
-  return Player::submarine;
+int Player::getSunkenShips() {
+  return this->sunkenShips;
 }
 
-void Player::setCruiser(int startX, int startY, int endX, int endY) {
-  Player::cruiser.create(startX, startY, endX, endY);
+bool Player::createShip(int startX, int startY, int endX, int endY) {
+  Ship ship;
+  ship.create(startX, startY, endX, endY);
+  Player::addShip(ship);
+  return true;  
 }
 
-Ship Player::getCruiser() {
-  return Player::cruiser;
+Ship Player::getShip(int arrayPosition) {
+  if (arrayPosition < 0 || arrayPosition >= this->ships.size()) {
+    Ship ship;
+    ship.create(0, 0, 0, 0);
+    return ship;
+  }
+  return this->ships[arrayPosition];
 }
 
-void Player::setBattleship(int startX, int startY, int endX, int endY) {
-  Player::battleship.create(startX, startY, endX, endY);
-}
-
-Ship Player::getBattleship() {
-  return Player::battleship;
-}
-
-void Player::setAircraftCarrier(int startX, int startY, int endX, int endY) {
-  Player::aircraftCarrier.create(startX, startY, endX, endY);
-}
-
-Ship Player::getAircraftCarrier() {
-  return Player::aircraftCarrier;
+std::vector<Ship> Player::getShipsList() {
+  return ships;
 }

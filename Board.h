@@ -9,6 +9,8 @@ class Board {
   public:
     int **get;
     Board(int rows, int cols);
-    void serialPrint();
+    void print();
     void placeShip(Ship ship);
+    int getPixel(int x, int y);
+    void setPixel(int x, int y, int value);
 };
