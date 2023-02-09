@@ -1,6 +1,6 @@
 #include "Player.h"
-#define rows 10
-#define cols 10
+#define rows 8
+#define cols 8
 
 Player::Player() : playerBoard(rows, cols) {
   sunkenShips = 0;

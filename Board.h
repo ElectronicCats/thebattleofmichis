@@ -10,6 +10,7 @@ class Board {
     int **get;
     Board(int rows, int cols);
     void print();
+    void illuminate();
     void placeShip(Ship ship);
     int getPixel(int x, int y);
     void setPixel(int x, int y, int value);

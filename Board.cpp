@@ -1,4 +1,11 @@
 #include "Board.h"
+#include <FastLED.h>
+
+#define MATRIX_PIN 4
+#define NUM_LEDS this->rows * this->cols
+#define COLOR_ORDER GRB
+#define CHIPSET WS2812B
+#define BRIGHTNESS 2
 
 Board::Board(int rows, int cols) {
   this->rows = rows;
@@ -17,6 +24,8 @@ Board::Board(int rows, int cols) {
 }
 
 void Board::print() {
+  Board::illuminate();
+
   Serial.print("  |");
   for (int i = 1; i <= cols; i++) {
       Serial.print(" ");
@@ -42,6 +51,29 @@ void Board::print() {
   }
 
   Serial.println("");
+}
+
+void Board::illuminate() {
+  CRGB leds[NUM_LEDS];
+  FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      int value = get[i][j];
+      if (value == 0) {
+        leds[i * cols + j] = CRGB::Blue;
+      } else if (value == 1) {
+        leds[i * cols + j] = CRGB::Green;
+      } else if (value == 2) {
+        leds[i * cols + j] = CRGB::White;
+      } else if (value == 3) {
+        leds[i * cols + j] = CRGB::Red;
+      }
+    }
+  }
+
+  FastLED.show();
 }
 
 /**
