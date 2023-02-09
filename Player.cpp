@@ -7,7 +7,7 @@ Player::Player() : playerBoard(rows, cols) {
 }
 
 int** Player::board() {
-  return playerBoard.get;
+  return playerBoard.board;
 }
 
 void Player::printBoard() {

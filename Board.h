@@ -1,5 +1,12 @@
 #include "Arduino.h"
 #include "Ship.h"
+#include <FastLED.h>
+
+#define MATRIX_PIN 4
+#define NUM_LEDS this->rows * this->cols
+#define COLOR_ORDER GRB
+#define CHIPSET WS2812B
+#define BRIGHTNESS 2
 
 class Board {
   private:
@@ -7,7 +14,7 @@ class Board {
     int cols;
 
   public:
-    int **get;
+    int **board;
     Board(int rows, int cols);
     void print();
     void illuminate();
