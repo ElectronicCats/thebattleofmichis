@@ -83,6 +83,7 @@ void Board::placeShip(Ship ship) {
 }
 
 void Board::setCursor(int x, int y) {
+  // TODO: Make this with millis
   int pixel = Board::getPixel(x, y);
   Board::setPixel(x, y, 3);
   Board::print();

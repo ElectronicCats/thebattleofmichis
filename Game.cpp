@@ -6,10 +6,16 @@ Game::Game() {
 
 void Game::start() {
   Game::setup();
+  int counter = 0;
 
   for(;;) {
     // Logic game goes here
     player1.setCursor(2, 6);
+    player1.joystick.button.loop();
+    if (player1.joystick.button.isPressed()) {
+      counter++;
+    }
+    Serial.println("Counter: " + String(counter));
   }
 }
 
