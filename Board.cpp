@@ -82,6 +82,20 @@ void Board::placeShip(Ship ship) {
   }
 }
 
+void Board::setCursor(int x, int y) {
+  int pixel = Board::getPixel(x, y);
+  Board::setPixel(x, y, 3);
+  Board::print();
+  delay(CURSOR_DELAY_TIME);
+  Board::setPixel(x, y, pixel);
+  Board::print();
+  delay(CURSOR_DELAY_TIME);
+}
+
+void Board::removeCursor(int x, int y) {
+
+}
+
 int Board::getPixel(int x, int y) {
   return this->board[y - 1][x - 1];
 }

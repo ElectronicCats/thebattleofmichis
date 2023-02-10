@@ -9,7 +9,7 @@ void Game::start() {
 
   for(;;) {
     // Logic game goes here
-    delay(10000);
+    player1.setCursor(2, 6);
   }
 }
 

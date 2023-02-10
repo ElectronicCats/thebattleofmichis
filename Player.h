@@ -22,4 +22,5 @@ class Player {
     bool isValidShipCoordinates(int startX, int startY, int endX, int endY);
     Ship getShip(int arrayPosition);
     std::vector<Ship> getShipsList();
+    void setCursor(int x, int y);
 };

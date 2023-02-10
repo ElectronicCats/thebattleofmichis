@@ -95,3 +95,7 @@ Ship Player::getShip(int arrayPosition) {
 std::vector<Ship> Player::getShipsList() {
   return ships;
 }
+
+void Player::setCursor(int x, int y) {
+  this->playerBoard.setCursor(x, y);
+}
