@@ -1,13 +1,13 @@
 #include "Player.h"
-#define rows 10
-#define cols 10
+#define rows 8
+#define cols 8
 
 Player::Player() : playerBoard(rows, cols) {
   sunkenShips = 0;
 }
 
 int** Player::board() {
-  return playerBoard.get;
+  return playerBoard.board;
 }
 
 void Player::printBoard() {
@@ -94,4 +94,8 @@ Ship Player::getShip(int arrayPosition) {
 
 std::vector<Ship> Player::getShipsList() {
   return ships;
+}
+
+void Player::setCursor(int x, int y) {
+  this->playerBoard.setCursor(x, y);
 }
