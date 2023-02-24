@@ -51,18 +51,48 @@ void Board::illuminate() {
   FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
+  bool CUSTOM_BOARD = true;
+  
+  if (CUSTOM_BOARD) {
+    int customMap[64] = {
+      56, 55, 40, 39, 24, 23,  8,  7,
+      57, 54, 41, 38, 25, 22,  9,  6,
+      58, 53, 42, 37, 26, 21, 10,  5,
+      59, 52, 43, 36, 27, 20, 11,  4,
+      60, 51, 44, 35, 28, 19, 12,  3,
+      61, 50, 45, 34, 29, 18, 13,  2,
+      62, 49, 46, 33, 30, 17, 14,  1,
+      63, 48, 47, 32, 31, 16, 15,  0};
 
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      int value = board[i][j];
+    for (int i = 0; i < NUM_LEDS; i++) {
+      int index = customMap[i];
+      int row = index / cols;
+      int col = index % cols;
+      int value = board[row][col];
+
       if (value == 0) {
-        leds[i * cols + j] = CRGB::Blue;
+        leds[i] = CRGB::Blue;
       } else if (value == 1) {
-        leds[i * cols + j] = CRGB::Green;
+        leds[i] = CRGB::Green;
       } else if (value == 2) {
-        leds[i * cols + j] = CRGB::White;
+        leds[i] = CRGB::White;
       } else if (value == 3) {
-        leds[i * cols + j] = CRGB::Red;
+        leds[i] = CRGB::Red;
+      }
+    }
+  } else {
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        int value = board[i][j];
+        if (value == 0) {
+          leds[i * cols + j] = CRGB::Blue;
+        } else if (value == 1) {
+          leds[i * cols + j] = CRGB::Green;
+        } else if (value == 2) {
+          leds[i * cols + j] = CRGB::White;
+        } else if (value == 3) {
+          leds[i * cols + j] = CRGB::Red;
+        }
       }
     }
   }
