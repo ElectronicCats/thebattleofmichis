@@ -1,5 +1,24 @@
 #include "Board.h"
 
+cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> boardUp;
+
+const uint8_t SpriteBoardData[] = {
+  0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
+  0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10,
+  0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,
+  0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x20,
+  0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,
+  0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,0x30,
+  0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
+  0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F,0x40
+  };
+
+struct CRGB SpriteBoardCols[64]; 
+
+cSprite SpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, SpriteBoardCols);
+
+cLEDSprites Sprites(&boardUp);
+
 Board::Board(int rows, int cols) {
   this->rows = rows;
   this->cols = cols;
@@ -46,57 +65,63 @@ void Board::print() {
   Serial.println("");
 }
 
+void Board::init() {
+
+  Serial.println("\n  Start board...");
+
+  FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  FastLED.setBrightness(8);
+  FastLED.clear(true);
+  delay(500);
+  FastLED.showColor(CRGB::Blue);
+  delay(1000);
+  FastLED.show();
+
+  //SpriteBoard.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 0/*XRate*/, 0/*YChange*/, 0/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
+  Sprites.AddSprite(&SpriteBoard);
+}
+
 void Board::illuminate() {
-  CRGB leds[NUM_LEDS];
-  FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(leds, NUM_LEDS);
-  FastLED.setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);
-  bool CUSTOM_BOARD = true;
+  FastLED.clear();
+   
+  bool CUSTOM_BOARD = false;
   
   if (CUSTOM_BOARD) {
-    int customMap[64] = {
-      56, 55, 40, 39, 24, 23,  8,  7,
-      57, 54, 41, 38, 25, 22,  9,  6,
-      58, 53, 42, 37, 26, 21, 10,  5,
-      59, 52, 43, 36, 27, 20, 11,  4,
-      60, 51, 44, 35, 28, 19, 12,  3,
-      61, 50, 45, 34, 29, 18, 13,  2,
-      62, 49, 46, 33, 30, 17, 14,  1,
-      63, 48, 47, 32, 31, 16, 15,  0};
-
-    for (int i = 0; i < NUM_LEDS; i++) {
-      int index = customMap[i];
-      int row = index / cols;
-      int col = index % cols;
-      int value = board[row][col];
-
-      if (value == 0) {
-        leds[i] = CRGB::Blue;
-      } else if (value == 1) {
-        leds[i] = CRGB::Green;
-      } else if (value == 2) {
-        leds[i] = CRGB::White;
-      } else if (value == 3) {
-        leds[i] = CRGB::Red;
-      }
-    }
+//    for (int i = 0; i < NUM_LEDS; i++) {
+//      int index = i; //customMap[i];
+//      int row = index / cols;
+//      int col = index % cols;
+//      int value = board[row][col];
+//
+//      if (value == 0) {
+//        leds[i] = CRGB::Blue;
+//      } else if (value == 1) {
+//        leds[i] = CRGB::Green;
+//      } else if (value == 2) {
+//        leds[i] = CRGB::White;
+//      } else if (value == 3) {
+//        leds[i] = CRGB::Red;
+//      }
+//    }
   } else {
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         int value = board[i][j];
         if (value == 0) {
-          leds[i * cols + j] = CRGB::Blue;
+          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
         } else if (value == 1) {
-          leds[i * cols + j] = CRGB::Green;
+          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
         } else if (value == 2) {
-          leds[i * cols + j] = CRGB::White;
+          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
         } else if (value == 3) {
-          leds[i * cols + j] = CRGB::Red;
+          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
         }
       }
     }
   }
-
+  
+  Sprites.UpdateSprites();
+  Sprites.RenderSprites();
   FastLED.show();
 }
 
