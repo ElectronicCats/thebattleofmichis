@@ -11,11 +11,11 @@ const uint8_t SpriteBoardData[] = {
   0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,0x30,
   0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
   0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F,0x40
-  };
+};
 
-struct CRGB SpriteBoardCols[64]; 
+struct CRGB SpriteBoardCols[64];
 
-cSprite SpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, SpriteBoardCols);
+cSprite SpriteBoard(8, 8, SpriteBoardData, 1, _4BIT, SpriteBoardCols);
 
 cLEDSprites Sprites(&boardUp);
 
@@ -66,44 +66,25 @@ void Board::print() {
 }
 
 void Board::init() {
+  // FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  // FastLED.setBrightness(8);
+  // FastLED.clear(true);
+  // FastLED.show();
 
-  Serial.println("\n  Start board...");
-
-  FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(boardUp[0], boardUp.Size());
-  FastLED.setBrightness(8);
-  FastLED.clear(true);
-  delay(500);
-  FastLED.showColor(CRGB::Blue);
-  delay(1000);
-  FastLED.show();
-
-  //SpriteBoard.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 0/*XRate*/, 0/*YChange*/, 0/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-  Sprites.AddSprite(&SpriteBoard);
+  // //SpriteBoard.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 0/*XRate*/, 0/*YChange*/, 0/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
+  // Sprites.AddSprite(&SpriteBoard);
 }
 
 void Board::illuminate() {
-  FastLED.clear();
-   
-  bool CUSTOM_BOARD = false;
+  //FastLED.clear();
   
   if (CUSTOM_BOARD) {
-//    for (int i = 0; i < NUM_LEDS; i++) {
-//      int index = i; //customMap[i];
-//      int row = index / cols;
-//      int col = index % cols;
-//      int value = board[row][col];
-//
-//      if (value == 0) {
-//        leds[i] = CRGB::Blue;
-//      } else if (value == 1) {
-//        leds[i] = CRGB::Green;
-//      } else if (value == 2) {
-//        leds[i] = CRGB::White;
-//      } else if (value == 3) {
-//        leds[i] = CRGB::Red;
-//      }
-//    }
-  } else {
+    // Electronic Cats board
+    FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(boardUp[0], boardUp.Size());
+    FastLED.setBrightness(8);
+    FastLED.clear(true);
+    Sprites.AddSprite(&SpriteBoard);
+
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         int value = board[i][j];
@@ -118,10 +99,31 @@ void Board::illuminate() {
         }
       }
     }
+    Sprites.UpdateSprites();
+    Sprites.RenderSprites();
+  } else {
+    // CJMCU-64 board
+    CRGB leds[NUM_LEDS];
+    FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+    //FastLED.setCorrection(TypicalLEDStrip);
+    FastLED.setBrightness(BRIGHTNESS);
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        int value = board[i][j];
+        if (value == 0) {
+          leds[i * cols + j] = CRGB::Blue;
+        } else if (value == 1) {
+          leds[i * cols + j] = CRGB::Green;
+        } else if (value == 2) {
+          leds[i * cols + j] = CRGB::White;
+        } else if (value == 3) {
+          leds[i * cols + j] = CRGB::Red;
+        }
+      }
+    }
   }
   
-  Sprites.UpdateSprites();
-  Sprites.RenderSprites();
   FastLED.show();
 }
 

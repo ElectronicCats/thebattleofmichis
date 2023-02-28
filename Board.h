@@ -5,9 +5,10 @@
 #include <LEDMatrix.h>
 #include <LEDSprites.h>
 
+#define CUSTOM_BOARD false
 #define MATRIX_PIN 4
 #define NUM_LEDS this->rows * this->cols
-#define COLOR_ORDER    RGB
+#define COLOR_ORDER    GRB // GRB ordering is typical for the WS2812B chipset
 #define CHIPSET        WS2812B
 
 #define MATRIX_WIDTH   -8
