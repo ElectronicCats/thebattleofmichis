@@ -67,17 +67,10 @@ void Board::print() {
 
 void Board::init() {
 
-  Serial.println("\n  Start board...");
-
   FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(boardUp[0], boardUp.Size());
   FastLED.setBrightness(8);
   FastLED.clear(true);
-  delay(500);
-  FastLED.showColor(CRGB::Blue);
-  delay(1000);
-  FastLED.show();
 
-  //SpriteBoard.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 0/*XRate*/, 0/*YChange*/, 0/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
   Sprites.AddSprite(&SpriteBoard);
 }
 
