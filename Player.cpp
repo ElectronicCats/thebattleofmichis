@@ -11,7 +11,6 @@ int** Player::board() {
 }
 
 void Player::printBoard() {
-  playerBoard.init();
   playerBoard.print();
 }
 
