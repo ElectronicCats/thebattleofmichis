@@ -1,6 +1,7 @@
 #include "Board.h"
 
-cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> boardUp;
+cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> mainBoardUp;
+cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> enemyBoardUp;
 
 const uint8_t SpriteBoardData[] = {
   0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
@@ -19,7 +20,8 @@ struct CRGB EnemySpriteBoardCols[64];
 cSprite MainSpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, MainSpriteBoardCols);
 cSprite EnemySpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, EnemySpriteBoardCols);
 
-cLEDSprites Sprites(&boardUp);
+cLEDSprites MainSprites(&mainBoardUp);
+cLEDSprites EnemySprites(&enemyBoardUp);
 
 Board::Board(int rows, int cols) {
   this->rows = rows;
@@ -79,17 +81,17 @@ void Board::print() {
 }
 
 void Board::initMainBoard() {
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
-  Sprites.AddSprite(&MainSpriteBoard);
+  MainSprites.AddSprite(&MainSpriteBoard);
 }
 
 void Board::initEnemyBoard() {
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(enemyBoardUp[0], enemyBoardUp.Size());
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
-  Sprites.AddSprite(&MainSpriteBoard);
+  EnemySprites.AddSprite(&EnemySpriteBoard);
 }
 
 // Fill the board with the colors
@@ -127,8 +129,10 @@ void Board::illuminate() {
     }
   }
 
-  Sprites.UpdateSprites();
-  Sprites.RenderSprites();
+  MainSprites.UpdateSprites();
+  MainSprites.RenderSprites();
+  EnemySprites.UpdateSprites();
+  EnemySprites.RenderSprites();
   FastLED.show();
 }
 
