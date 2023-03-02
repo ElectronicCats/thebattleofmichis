@@ -11,26 +11,39 @@ const uint8_t SpriteBoardData[] = {
   0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,0x30,
   0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
   0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F,0x40
-  };
+};
 
-struct CRGB SpriteBoardCols[64]; 
+struct CRGB MainSpriteBoardCols[64];
+struct CRGB EnemySpriteBoardCols[64];
 
-cSprite SpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, SpriteBoardCols);
+cSprite MainSpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, MainSpriteBoardCols);
+cSprite EnemySpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, EnemySpriteBoardCols);
 
 cLEDSprites Sprites(&boardUp);
 
 Board::Board(int rows, int cols) {
   this->rows = rows;
   this->cols = cols;
-  this->board = new int*[rows];
+  this->main = new int*[rows];
+  this->enemy = new int*[rows];
 
+  // Fill the main board with 0
   for (int row = 0; row < rows; row++) {
-    board[row] = new int[cols];
+    main[row] = new int[cols];
   }
-
   for (int row = 0; row < rows; row++) {
     for (int col = 0; col < cols; col++) {
-      board[row][col] = 0;
+      main[row][col] = 0;
+    }
+  }
+
+  // Fill the enemy board with 0
+  for (int row = 0; row < rows; row++) {
+    enemy[row] = new int[cols];
+  }
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < cols; col++) {
+      enemy[row][col] = 0;
     }
   }
 }
@@ -51,7 +64,7 @@ void Board::print() {
     Serial.print(" |");
     for (int col = 0; col < cols; col++) {
         Serial.print(" ");
-        Serial.print(board[row][col]);
+        Serial.print(main[row][col]);
         Serial.print(" |");
     }
     Serial.println();
@@ -65,61 +78,55 @@ void Board::print() {
   Serial.println("");
 }
 
-void Board::init() {
-
-  Serial.println("\n  Start board...");
-
-  FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(boardUp[0], boardUp.Size());
-  FastLED.setBrightness(8);
+void Board::initMainBoard() {
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
-  delay(500);
-  FastLED.showColor(CRGB::Blue);
-  delay(1000);
-  FastLED.show();
-
-  //SpriteBoard.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 0/*XRate*/, 0/*YChange*/, 0/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-  Sprites.AddSprite(&SpriteBoard);
+  Sprites.AddSprite(&MainSpriteBoard);
 }
 
+void Board::initEnemyBoard() {
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.clear(true);
+  Sprites.AddSprite(&MainSpriteBoard);
+}
+
+// Fill the board with the colors
 void Board::illuminate() {
-  FastLED.clear();
-   
-  bool CUSTOM_BOARD = false;
-  
-  if (CUSTOM_BOARD) {
-//    for (int i = 0; i < NUM_LEDS; i++) {
-//      int index = i; //customMap[i];
-//      int row = index / cols;
-//      int col = index % cols;
-//      int value = board[row][col];
-//
-//      if (value == 0) {
-//        leds[i] = CRGB::Blue;
-//      } else if (value == 1) {
-//        leds[i] = CRGB::Green;
-//      } else if (value == 2) {
-//        leds[i] = CRGB::White;
-//      } else if (value == 3) {
-//        leds[i] = CRGB::Red;
-//      }
-//    }
-  } else {
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        int value = board[i][j];
-        if (value == 0) {
-          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
-        } else if (value == 1) {
-          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
-        } else if (value == 2) {
-          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
-        } else if (value == 3) {
-          SpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
-        }
+  Board::initMainBoard();
+  Board::initEnemyBoard();
+
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      int value = main[i][j];
+      if (value == 0) {
+        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
+      } else if (value == 1) {
+        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
+      } else if (value == 2) {
+        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
+      } else if (value == 3) {
+        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
       }
     }
   }
-  
+
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      int value = enemy[i][j];
+      if (value == 0) {
+        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
+      } else if (value == 1) {
+        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
+      } else if (value == 2) {
+        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
+      } else if (value == 3) {
+        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
+      }
+    }
+  }
+
   Sprites.UpdateSprites();
   Sprites.RenderSprites();
   FastLED.show();
@@ -129,13 +136,15 @@ void Board::illuminate() {
   * Takes an object of type Ship and and change the values
   * of the coordinates from zero to one on the board
   */
+
 void Board::placeShip(Ship ship) {
   for (int row = ship.getStartY(); row <= ship.getEndY(); row++) {
     for (int col = ship.getStartX(); col <= ship.getEndX(); col++) {
-      board[row][col] = 1;
+      main[row][col] = 1;
     }
   }
 }
+
 
 void Board::setCursor(int x, int y) {
   // TODO: Make this with millis
@@ -153,9 +162,9 @@ void Board::removeCursor(int x, int y) {
 }
 
 int Board::getPixel(int x, int y) {
-  return this->board[y - 1][x - 1];
+  return this->main[y - 1][x - 1];
 }
 
 void Board::setPixel(int x, int y, int value) {
-  this->board[y - 1][x - 1] = value;
+  this->main[y - 1][x - 1] = value;
 }

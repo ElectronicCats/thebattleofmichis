@@ -3,15 +3,17 @@
 #include <vector>
 #include "Joystick.h"
 
+#define ROWS 8
+#define COLS 8
+
 class Player {
   private:
-    Board playerBoard;    // 10x10
+    Board board;
     int sunkenShips;      // 5 when all ships are sunken
     std::vector<Ship> ships;
 
   public:
     Player();
-    int** board();
     void printBoard();
 
     void placeShip(Ship ship); // Place a ship on the board
