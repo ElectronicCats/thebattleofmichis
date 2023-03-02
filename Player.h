@@ -5,19 +5,15 @@
 
 #define ROWS 8
 #define COLS 8
-const int PIN_MATRIX_1 = 16;
-const int PIN_MATRIX_2 = 17;
 
 class Player {
   private:
-    Board<16> mainBoard;
-    Board<16> enemyBoard;
+    Board board;
     int sunkenShips;      // 5 when all ships are sunken
     std::vector<Ship> ships;
 
   public:
     Player();
-    int** board();
     void printBoard();
 
     void placeShip(Ship ship); // Place a ship on the board
