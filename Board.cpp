@@ -53,6 +53,7 @@ Board::Board(int rows, int cols) {
 void Board::print() {
   Board::illuminate();
 
+  // Print the main board
   Serial.print("  |");
   for (int i = 1; i <= cols; i++) {
       Serial.print(" ");
@@ -76,7 +77,31 @@ void Board::print() {
     }
     Serial.println("--------");
   }
+  Serial.println("");
 
+  // Print the enemy board
+  Serial.print("  |");
+  for (int i = 1; i <= cols; i++) {
+      Serial.print(" ");
+      Serial.print(i);
+      Serial.print(" |");
+  }
+  Serial.println("\n  -----------------------------------------");
+  for (int row = 0; row < rows; row++) {
+    Serial.print((char)('A' + row % 26)); // Increase the letter -> A, B, C, ...
+    Serial.print(" |");
+    for (int col = 0; col < cols; col++) {
+        Serial.print(" ");
+        Serial.print(enemy[row][col]);
+        Serial.print(" |");
+    }
+    Serial.println();
+    Serial.print("  ");
+    for (int i = 0; i <= cols; i++) {
+        Serial.print("---");
+    }
+    Serial.println("--------");
+  }
   Serial.println("");
 }
 
@@ -152,11 +177,11 @@ void Board::placeShip(Ship ship) {
 
 void Board::setCursor(int x, int y) {
   // TODO: Make this with millis
-  int pixel = Board::getPixel(x, y);
-  Board::setPixel(x, y, 3);
+  int pixel = Board::getPixel('m', x, y);
+  Board::setPixel('m', x, y, 3);
   Board::print();
   delay(CURSOR_DELAY_TIME);
-  Board::setPixel(x, y, pixel);
+  Board::setPixel('m', x, y, pixel);
   Board::print();
   delay(CURSOR_DELAY_TIME);
 }
@@ -165,10 +190,11 @@ void Board::removeCursor(int x, int y) {
 
 }
 
-int Board::getPixel(int x, int y) {
-  return this->main[y - 1][x - 1];
+// id = 'm' for main board, 'e' for enemy board
+int Board::getPixel(char id, int x, int y) {
+  return id == 'm' ? main[y - 1][x - 1] : enemy[y - 1][x - 1];
 }
 
-void Board::setPixel(int x, int y, int value) {
-  this->main[y - 1][x - 1] = value;
+void Board::setPixel(char id, int x, int y, int value) {
+  id == 'm' ? main[y - 1][x - 1] = value : enemy[y - 1][x - 1] = value;
 }

@@ -25,10 +25,10 @@ void Player::hit(int x, int y) {
   for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
       Player::isShipSunken(ship);
-      this->board.setPixel(x, y, 3);
+      this->board.setPixel('e', x, y, 3);
     } else {
-      if (this->board.getPixel(x, y) != 3) {
-        this->board.setPixel(x, y, 2);
+      if (this->board.getPixel('m', x, y) != 3) {
+        this->board.setPixel('e', x, y, 2);
       }
     }
   }

@@ -6,8 +6,8 @@
 #include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
 
 #define CUSTOM_BOARD      false // true -> Electronic Cats board, false -> CJMCU-64 board
-#define PIN_MATRIX_1 16
-#define PIN_MATRIX_2 17
+#define PIN_MATRIX_1      16
+#define PIN_MATRIX_2      17
 #define COLOR_ORDER       GRB // GRB ordering is typical for the WS2812B chipset
 #define CHIPSET           WS2812B
 
@@ -36,6 +36,6 @@ class Board {
     void placeShip(Ship ship);
     void setCursor(int x, int y);
     void removeCursor(int x, int y);
-    int getPixel(int x, int y);
-    void setPixel(int x, int y, int value);
+    int getPixel(char id, int x, int y); // id = 'm' for main board, 'e' for enemy board
+    void setPixel(char id, int x, int y, int value);
 };
