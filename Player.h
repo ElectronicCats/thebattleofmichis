@@ -3,10 +3,15 @@
 #include <vector>
 #include "Joystick.h"
 
+#define ROWS 8
+#define COLS 8
+const int PIN_MATRIX_1 = 16;
+const int PIN_MATRIX_2 = 17;
+
 class Player {
   private:
-    Board mainBoard;
-    Board enemyBoard;
+    Board<16> mainBoard;
+    Board<16> enemyBoard;
     int sunkenShips;      // 5 when all ships are sunken
     std::vector<Ship> ships;
 

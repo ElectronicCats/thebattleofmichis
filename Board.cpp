@@ -19,11 +19,13 @@ cSprite SpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, SpriteBoardCols);
 
 cLEDSprites Sprites(&boardUp);
 
-Board::Board(int rows, int cols) {
+template <int pin>
+Board<pin>::Board(int rows, int cols) {
   // Fill the board with 0
   this->rows = rows;
   this->cols = cols;
   this->board = new int*[rows];
+  this->pin = pin;
 
   for (int row = 0; row < rows; row++) {
     board[row] = new int[cols];
@@ -35,9 +37,9 @@ Board::Board(int rows, int cols) {
     }
   }
 }
-
-void Board::print() {
-  Board::illuminate();
+template <int pin>
+void Board<pin>::print() {
+  Board<pin>::illuminate();
 
   Serial.print("  |");
   for (int i = 1; i <= cols; i++) {
@@ -66,16 +68,18 @@ void Board::print() {
   Serial.println("");
 }
 
-void Board::init_leds() {
-  FastLED.addLeds<CHIPSET, MATRIX_PIN, COLOR_ORDER>(boardUp[0], boardUp.Size());
+template <int pin>
+void Board<pin>::init_leds() {
+  FastLED.addLeds<CHIPSET, pin, COLOR_ORDER>(boardUp[0], boardUp.Size());
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
   Sprites.AddSprite(&SpriteBoard);
 }
 
 // Fill the board with the colors
-void Board::illuminate() {
-  Board::init_leds();
+template <int pin>
+void Board<pin>::illuminate() {
+  Board<pin>::init_leds();
 
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
@@ -100,7 +104,8 @@ void Board::illuminate() {
   * Takes an object of type Ship and and change the values
   * of the coordinates from zero to one on the board
   */
-void Board::placeShip(Ship ship) {
+template <int pin>
+void Board<pin>::placeShip(Ship ship) {
   for (int row = ship.getStartY(); row <= ship.getEndY(); row++) {
     for (int col = ship.getStartX(); col <= ship.getEndX(); col++) {
       board[row][col] = 1;
@@ -108,25 +113,29 @@ void Board::placeShip(Ship ship) {
   }
 }
 
-void Board::setCursor(int x, int y) {
+template <int pin>
+void Board<pin>::setCursor(int x, int y) {
   // TODO: Make this with millis
-  int pixel = Board::getPixel(x, y);
-  Board::setPixel(x, y, 3);
-  Board::print();
+  int pixel = Board<pin>::getPixel(x, y);
+  Board<pin>::setPixel(x, y, 3);
+  Board<pin>::print();
   delay(CURSOR_DELAY_TIME);
-  Board::setPixel(x, y, pixel);
-  Board::print();
+  Board<pin>::setPixel(x, y, pixel);
+  Board<pin>::print();
   delay(CURSOR_DELAY_TIME);
 }
 
-void Board::removeCursor(int x, int y) {
+template <int pin>
+void Board<pin>::removeCursor(int x, int y) {
 
 }
 
-int Board::getPixel(int x, int y) {
+template <int pin>
+int Board<pin>::getPixel(int x, int y) {
   return this->board[y - 1][x - 1];
 }
 
-void Board::setPixel(int x, int y, int value) {
+template <int pin>
+void Board<pin>::setPixel(int x, int y, int value) {
   this->board[y - 1][x - 1] = value;
 }

@@ -5,12 +5,12 @@
 #include <LEDMatrix.h>    // https://github.com/AaronLiddiment/LEDMatrix.git
 #include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
 
-#define CUSTOM_BOARD      true // true -> Electronic Cats board, false -> CJMCU-64 board
-#define MATRIX_PIN        4
+#define CUSTOM_BOARD      false // true -> Electronic Cats board, false -> CJMCU-64 board
+//#define MATRIX_PIN        this->pin
 #define COLOR_ORDER       GRB // GRB ordering is typical for the WS2812B chipset
 #define CHIPSET           WS2812B
 
-#define BRIGHTNESS        10
+#define BRIGHTNESS        3
 #define CURSOR_DELAY_TIME 200 // Miliseconds
 
 #define SHAPE_WIDTH       8
@@ -19,9 +19,9 @@
 #define MATRIX_WIDTH CUSTOM_BOARD ? -8 : 8
 #define MATRIX_HEIGHT CUSTOM_BOARD ? 8 : -8
 
+template <int pin>
 class Board {
   private:
-    int id;
     int rows;
     int cols;
     void init_leds();

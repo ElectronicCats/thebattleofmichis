@@ -1,9 +1,9 @@
 #include "Player.h"
-#define rows 8
-#define cols 8
 
-Player::Player() : mainBoard(rows, cols) {
+Player::Player() : mainBoard(ROWS, COLS), enemyBoard(ROWS, COLS) {
   sunkenShips = 0;
+  Board<16> mainBoard(ROWS, COLS);
+  Board<17> enemyBoard(ROWS, COLS);
 }
 
 int** Player::board() {
