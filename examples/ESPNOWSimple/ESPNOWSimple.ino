@@ -2,7 +2,11 @@
 #include <WiFi.h>
 
 // REPLACE WITH THE MAC Address of your receiver 
-uint8_t broadcastAddress[] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
+//uint8_t broadcastAddress[] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
+// First MAC: 08:3A:F2:A9:DE:BC
+uint8_t broadcastAddress[] = {0x08, 0x3A, 0xF2, 0xA9, 0xDE, 0xBC};
+// Second MAC: 40:22:D8:74:25:3C
+//uint8_t broadcastAddress[] = {0x40, 0x22, 0xD8, 0x74, 0x25, 0x3C};
 
 // Define variables to be sent
 uint8_t x;
@@ -61,6 +65,10 @@ void setup() {
  
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
+
+  // Show MAC address
+  Serial.print("Dirección MAC: ");
+  Serial.println(WiFi.macAddress());
 
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {

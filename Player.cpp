@@ -2,17 +2,16 @@
 #define rows 8
 #define cols 8
 
-Player::Player() : playerBoard(rows, cols) {
+Player::Player() : mainBoard(rows, cols) {
   sunkenShips = 0;
 }
 
 int** Player::board() {
-  return playerBoard.board;
+  return mainBoard.board;
 }
 
 void Player::printBoard() {
-  playerBoard.init();
-  playerBoard.print();
+  mainBoard.print();
 }
 
 /**
@@ -20,7 +19,7 @@ void Player::printBoard() {
   * of the coordinates from zero to one on the board
   */
 void Player::placeShip(Ship ship) {
-  playerBoard.placeShip(ship);
+  mainBoard.placeShip(ship);
 }
 
 // Add a ship to the list of ships
@@ -32,10 +31,10 @@ void Player::hit(int x, int y) {
   for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
       Player::isShipSunken(ship);
-      this->playerBoard.setPixel(x, y, 3);
+      this->enemyBoard.setPixel(x, y, 3);
     } else {
-      if (this->playerBoard.getPixel(x, y) != 3) {
-        this->playerBoard.setPixel(x, y, 2);
+      if (this->enemyBoard.getPixel(x, y) != 3) {
+        this->enemyBoard.setPixel(x, y, 2);
       }
     }
   }
@@ -98,5 +97,5 @@ std::vector<Ship> Player::getShipsList() {
 }
 
 void Player::setCursor(int x, int y) {
-  this->playerBoard.setCursor(x, y);
+  this->mainBoard.setCursor(x, y);
 }

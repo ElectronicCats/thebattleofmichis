@@ -5,7 +5,8 @@
 
 class Player {
   private:
-    Board playerBoard;    // 10x10
+    Board mainBoard;
+    Board enemyBoard;
     int sunkenShips;      // 5 when all ships are sunken
     std::vector<Ship> ships;
 
