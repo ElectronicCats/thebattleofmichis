@@ -21,6 +21,7 @@
 
 class Board {
   private:
+    int id;
     int rows;
     int cols;
     void init_leds();
