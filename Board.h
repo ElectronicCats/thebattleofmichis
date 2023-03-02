@@ -2,8 +2,8 @@
 #include "Ship.h"
 #include <FastLED.h>
 
-#include <LEDMatrix.h>
-#include <LEDSprites.h>
+#include <LEDMatrix.h>    // https://github.com/AaronLiddiment/LEDMatrix.git
+#include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
 
 #define CUSTOM_BOARD      true // true -> Electronic Cats board, false -> CJMCU-64 board
 #define MATRIX_PIN        4
