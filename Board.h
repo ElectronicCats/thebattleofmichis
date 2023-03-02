@@ -33,6 +33,7 @@ class Board {
     Board(int rows, int cols);
     void print();
     void illuminate();
+    void scroller();
     void placeShip(Ship ship);
     void setCursor(int x, int y);
     void removeCursor(int x, int y);
