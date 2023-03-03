@@ -10,4 +10,5 @@ class Game {
     Game();
     void start();
     void setup();
+    void placeShip(int length);
 };

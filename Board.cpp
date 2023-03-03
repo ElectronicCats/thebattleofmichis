@@ -64,61 +64,42 @@ Board::Board(int rows, int cols) {
   }
 }
 
+// Print the matrix on the serial monitor
+void Board::serialPrint(int **matrix) {
+  Serial.print("  |");
+  for (int i = 1; i <= cols; i++) {
+      Serial.print(" ");
+      Serial.print(i);
+      Serial.print(" |");
+  }
+  Serial.println("\n  -----------------------------------------");
+
+  for (int row = 0; row < rows; row++) {
+    Serial.print((char)('A' + row % 26)); // Increase the letter -> A, B, C, ...
+    Serial.print(" |");
+    for (int col = 0; col < cols; col++) {
+        Serial.print(" ");
+        Serial.print(matrix[row][col]);
+        Serial.print(" |");
+    }
+    Serial.println();
+    Serial.print("  ");
+    for (int i = 0; i <= cols; i++) {
+        Serial.print("---");
+    }
+    Serial.println("--------");
+  }
+  Serial.println("");
+}
+
+// Print the matrix on the LED matrix
 void Board::print() {
-  Board::illuminate();
-
-  /*
-  // Print the main board
-  Serial.print("  |");
-  for (int i = 1; i <= cols; i++) {
-      Serial.print(" ");
-      Serial.print(i);
-      Serial.print(" |");
-  }
-  Serial.println("\n  -----------------------------------------");
-
-  for (int row = 0; row < rows; row++) {
-    Serial.print((char)('A' + row % 26)); // Increase the letter -> A, B, C, ...
-    Serial.print(" |");
-    for (int col = 0; col < cols; col++) {
-        Serial.print(" ");
-        Serial.print(main[row][col]);
-        Serial.print(" |");
-    }
-    Serial.println();
-    Serial.print("  ");
-    for (int i = 0; i <= cols; i++) {
-        Serial.print("---");
-    }
-    Serial.println("--------");
-  }
-  Serial.println("");
-
-  // Print the enemy board
-  Serial.print("  |");
-  for (int i = 1; i <= cols; i++) {
-      Serial.print(" ");
-      Serial.print(i);
-      Serial.print(" |");
-  }
-  Serial.println("\n  -----------------------------------------");
-  for (int row = 0; row < rows; row++) {
-    Serial.print((char)('A' + row % 26)); // Increase the letter -> A, B, C, ...
-    Serial.print(" |");
-    for (int col = 0; col < cols; col++) {
-        Serial.print(" ");
-        Serial.print(enemy[row][col]);
-        Serial.print(" |");
-    }
-    Serial.println();
-    Serial.print("  ");
-    for (int i = 0; i <= cols; i++) {
-        Serial.print("---");
-    }
-    Serial.println("--------");
-  }
-  Serial.println("");
-  */
+  // Board::serialPrint(main);
+  // Board::serialPrint(enemy);
+  Board::initMainBoard();
+  Board::initEnemyBoard();
+  Board::illuminate('m', main);
+  Board::illuminate('e', enemy);
 }
 
 void Board::initMainBoard() {
@@ -153,36 +134,34 @@ void Board::scroller() {
 }
 
 // Fill the board with the colors
-void Board::illuminate() {
-  Board::initMainBoard();
-  Board::initEnemyBoard();
-
+void Board::illuminate(char id, int **matrix) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      int value = main[i][j];
+      int value = matrix[i][j];
       if (value == 0) {
-        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
+        if (id == 'm') {
+          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
+        } else if (id == 'e') {
+          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
+        }
       } else if (value == 1) {
-        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
+        if (id == 'm') {
+          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
+        } else if (id == 'e') {
+          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
+        }
       } else if (value == 2) {
-        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
+        if (id == 'm') {
+          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
+        } else if (id == 'e') {
+          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
+        }
       } else if (value == 3) {
-        MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
-      }
-    }
-  }
-
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      int value = enemy[i][j];
-      if (value == 0) {
-        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
-      } else if (value == 1) {
-        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
-      } else if (value == 2) {
-        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
-      } else if (value == 3) {
-        EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
+        if (id == 'm') {
+          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
+        } else if (id == 'e') {
+          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
+        }
       }
     }
   }
@@ -207,10 +186,18 @@ void Board::placeShip(Ship ship) {
   }
 }
 
-
-void Board::setCursor(char id, int x, int y) {
+void Board::setCursor(char id, int x, int y, int length, int orientation) {
   static int x_t = x;
   static int y_t = y;
+
+  // Validates if the line can be displayed
+  if (!(x >= 0 && x <= SHAPE_WIDTH - length) && orientation == Horizontal) {
+    x = SHAPE_WIDTH - length + 1;
+  }
+  if (!(y >= 0 && y <= SHAPE_HEIGHT - length) && orientation == Vertical) {
+    y = SHAPE_HEIGHT - length + 1;
+  }
+
   cursorX = x;
   cursorY = y;
   unsigned long time = millis();
@@ -220,7 +207,12 @@ void Board::setCursor(char id, int x, int y) {
 
   // If the cursor has moved, remove the old one
   if (x != x_t || y != y_t) {
-    Board::setPixel(id, x_t, y_t, pixel);
+    // Board::setPixel(id, x_t, y_t, pixel);
+    if (orientation == Horizontal) {
+      Board::setHorizontalLine(id, x_t, y_t, length, pixel);
+    } else if (orientation == Vertical) {
+      Board::setVerticalLine(id, x_t, y_t, length, pixel);
+    }
     x_t = x;
     y_t = y;
     pixel = Board::getPixel(id, x, y);
@@ -231,13 +223,21 @@ void Board::setCursor(char id, int x, int y) {
   }
 
   // Blink the cursor
-  if (time - lastTime > CURSOR_DELAY_TIME) {
-    state = !state;
-    lastTime = time;
+  // if (time - lastTime > CURSOR_DELAY_TIME) {
+  //   state = !state;
+  //   lastTime = time;
 
-    Board::setPixel(id, x_t, y_t, state ? 3 : pixel);
-    Board::print();
+  //   Board::setPixel(id, x_t, y_t, state ? 3 : pixel);
+  //   Board::print();
+  // }
+
+  if (orientation == Horizontal) {
+    Board::setHorizontalLine(id, x_t, y_t, length, Red);
+  } else if (orientation == Vertical) {
+    Board::setVerticalLine(id, x_t, y_t, length, Red);
   }
+
+  Board::print();
 }
 
 int Board::getCursorX() {
@@ -255,4 +255,22 @@ int Board::getPixel(char id, int x, int y) {
 
 void Board::setPixel(char id, int x, int y, int value) {
   id == 'm' ? main[y - 1][x - 1] = value : enemy[y - 1][x - 1] = value;
+}
+
+void Board::setHorizontalLine(char id, int x, int y, int length, int color) {
+  for (int i = 0; i < length; i++) {
+    int x_t = x + i;
+    if (x_t >= 0 && x_t <= SHAPE_WIDTH) {
+      Board::setPixel(id, x_t, y, color);
+    }
+  }
+}
+
+void Board::setVerticalLine(char id, int x, int y, int length, int color) {
+  for (int i = 0; i < length; i++) {
+    int y_t = y + i;
+    if (y_t >= 0 && y_t <= SHAPE_HEIGHT) {
+      Board::setPixel(id, x, y_t, color);
+    }
+  }
 }

@@ -90,14 +90,13 @@ std::vector<Ship> Player::getShipsList() {
   return ships;
 }
 
-void Player::setCursor(char id, int x, int y) {
+void Player::setCursor(char id, int x, int y, int length, int orientation) {
   static int x_t = x;
   static int y_t = y;
-  unsigned long time = millis();
   static unsigned long lastTime = 0;
 
   if (millis() - lastTime >= MOVE_DELAY) {
-    lastTime = time;
+    lastTime = millis();
 
     // LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, CENTER = 4
     switch (this->joystick.getDirection()) {
@@ -115,7 +114,7 @@ void Player::setCursor(char id, int x, int y) {
         break;
     }
     // Update the cursor position
-    this->board.setCursor(id, x_t, y_t);
+    this->board.setCursor(id, x_t, y_t, length, orientation);
   }
 }
 
