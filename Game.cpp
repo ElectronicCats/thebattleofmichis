@@ -15,7 +15,7 @@ void Game::start() {
     player1.joystick.loop();
 
     //player1.setCursor('e', 4, 4);
-    player1.setCursor('m', 4, 4, 5);
+    player1.setCursor('m', 4, 4, 5, 0);
 
     if (player1.joystick.button.isPressed()) {
       counter++;

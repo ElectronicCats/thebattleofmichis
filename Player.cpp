@@ -90,7 +90,7 @@ std::vector<Ship> Player::getShipsList() {
   return ships;
 }
 
-void Player::setCursor(char id, int x, int y, int length) {
+void Player::setCursor(char id, int x, int y, int length, int orientation) {
   static int x_t = x;
   static int y_t = y;
   static unsigned long lastTime = 0;
@@ -114,7 +114,7 @@ void Player::setCursor(char id, int x, int y, int length) {
         break;
     }
     // Update the cursor position
-    this->board.setCursor(id, x_t, y_t, length);
+    this->board.setCursor(id, x_t, y_t, length, orientation);
   }
 }
 

@@ -186,13 +186,16 @@ void Board::placeShip(Ship ship) {
   }
 }
 
-void Board::setCursor(char id, int x, int y, int length) {
+void Board::setCursor(char id, int x, int y, int length, int orientation) {
   static int x_t = x;
   static int y_t = y;
 
   // Validates if the line can be displayed
   if (!(x >= 0 && x <= SHAPE_WIDTH - length)) {
     x = SHAPE_WIDTH - length + 1;
+  }
+  if (!(y >= 0 && y <= SHAPE_HEIGHT - length)) {
+    y = SHAPE_HEIGHT - length + 1;
   }
 
   cursorX = x;
@@ -205,7 +208,11 @@ void Board::setCursor(char id, int x, int y, int length) {
   // If the cursor has moved, remove the old one
   if (x != x_t || y != y_t) {
     // Board::setPixel(id, x_t, y_t, pixel);
-    Board::setHorizontalLine(id, x_t, y_t, length, pixel);
+    if (orientation == Horizontal) {
+      Board::setHorizontalLine(id, x_t, y_t, length, pixel);
+    } else if (orientation == Vertical) {
+      Board::setVerticalLine(id, x_t, y_t, length, pixel);
+    }
     x_t = x;
     y_t = y;
     pixel = Board::getPixel(id, x, y);
@@ -224,7 +231,12 @@ void Board::setCursor(char id, int x, int y, int length) {
   //   Board::print();
   // }
 
-  Board::setHorizontalLine(id, x_t, y_t, length, Red);
+  if (orientation == Horizontal) {
+    Board::setHorizontalLine(id, x_t, y_t, length, Red);
+  } else if (orientation == Vertical) {
+    Board::setVerticalLine(id, x_t, y_t, length, Red);
+  }
+
   Board::print();
 }
 
@@ -250,6 +262,15 @@ void Board::setHorizontalLine(char id, int x, int y, int length, int color) {
     int x_t = x + i;
     if (x_t >= 0 && x_t <= SHAPE_WIDTH) {
       Board::setPixel(id, x_t, y, color);
+    }
+  }
+}
+
+void Board::setVerticalLine(char id, int x, int y, int length, int color) {
+  for (int i = 0; i < length; i++) {
+    int y_t = y + i;
+    if (y_t >= 0 && y_t <= SHAPE_HEIGHT) {
+      Board::setPixel(id, x, y_t, color);
     }
   }
 }
