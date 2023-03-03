@@ -189,12 +189,13 @@ void Board::placeShip(Ship ship) {
 void Board::setCursor(char id, int x, int y, int length, int orientation) {
   static int x_t = x;
   static int y_t = y;
+  static int orientation_t = orientation;
 
   // Validates if the line can be displayed
-  if (!(x >= 0 && x <= SHAPE_WIDTH - length) && orientation == Horizontal) {
+  if (!(x >= 0 && x <= SHAPE_WIDTH - length) && orientation_t == Horizontal) {
     x = SHAPE_WIDTH - length + 1;
   }
-  if (!(y >= 0 && y <= SHAPE_HEIGHT - length) && orientation == Vertical) {
+  if (!(y >= 0 && y <= SHAPE_HEIGHT - length) && orientation_t == Vertical) {
     y = SHAPE_HEIGHT - length + 1;
   }
 
@@ -203,10 +204,8 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
   unsigned long time = millis();
   static unsigned long lastTime = time;
   static bool state = false;
-  static int pixel = Board::getPixel(id, x, y); // Saves the color of the current pixel
 
   // Save the colors of the current line of pixels
-  static std::vector<int> pixels;
   if (pixels.size() == 0) {
     Serial.println("Initializing pixels...");
     if (orientation == Horizontal) {
@@ -230,14 +229,14 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
   }
 
   // If the cursor has moved, remove the old one
-  if (x != x_t || y != y_t) {
+  if (x != x_t || y != y_t || orientation != orientation_t) {
     // Restore the original colors of the line of pixels
-    if (orientation == Horizontal) {
+    if (orientation_t == Horizontal) {
       for (int i = 0; i < length; i++) {
-        Serial.println("Restored: " + String(Board::getPixel(id, x_t + i, y_t)));
+        // Serial.println("Restored: " + String(Board::getPixel(id, x_t + i, y_t)));
         Board::setPixel(id, x_t + i, y_t, pixels[i]);
       }
-    } else if (orientation == Vertical) {
+    } else if (orientation_t == Vertical) {
       for (int i = 0; i < length; i++) {
         Board::setPixel(id, x_t, y_t + i, pixels[i]);
       }
@@ -245,27 +244,22 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
 
     // Update the new colors
     pixels.clear();
-    if (orientation == Horizontal) {
+    if (orientation_t == Horizontal) {
       for (int i = 0; i < length; i++) {
         pixels.push_back(Board::getPixel(id, x + i, y));
       }
-    } else if (orientation == Vertical) {
+    } else if (orientation_t == Vertical) {
       for (int i = 0; i < length; i++) {
         pixels.push_back(Board::getPixel(id, x, y + i));
       }
     }
 
-    // Board::setPixel(id, x_t, y_t, pixel);
-    // if (orientation == Horizontal) {
-    //   Board::setHorizontalLine(id, x_t, y_t, length, pixel);
-    // } else if (orientation == Vertical) {
-    //   Board::setVerticalLine(id, x_t, y_t, length, pixel);
-    // }
+    // Update the variables
     x_t = x;
     y_t = y;
-    pixel = Board::getPixel(id, x, y);
     cursorX = x;
     cursorY = y;
+    orientation_t = orientation;
     state = false;
     lastTime = time;
   }
@@ -279,9 +273,9 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
   //   Board::print();
   // }
 
-  if (orientation == Horizontal) {
+  if (orientation_t == Horizontal) {
     Board::setHorizontalLine(id, x_t, y_t, length, Green);
-  } else if (orientation == Vertical) {
+  } else if (orientation_t == Vertical) {
     Board::setVerticalLine(id, x_t, y_t, length, Green);
   }
 

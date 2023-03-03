@@ -32,6 +32,7 @@ class Board {
     void serialPrint(int **matrix);
     enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
     enum Orientation { Horizontal = 0, Vertical = 1 };
+    std::vector<int> pixels;
 
   public:
     int **main;
