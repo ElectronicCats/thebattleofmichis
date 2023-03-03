@@ -191,10 +191,10 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
   static int y_t = y;
 
   // Validates if the line can be displayed
-  if (!(x >= 0 && x <= SHAPE_WIDTH - length)) {
+  if (!(x >= 0 && x <= SHAPE_WIDTH - length) && orientation == Horizontal) {
     x = SHAPE_WIDTH - length + 1;
   }
-  if (!(y >= 0 && y <= SHAPE_HEIGHT - length)) {
+  if (!(y >= 0 && y <= SHAPE_HEIGHT - length) && orientation == Vertical) {
     y = SHAPE_HEIGHT - length + 1;
   }
 
