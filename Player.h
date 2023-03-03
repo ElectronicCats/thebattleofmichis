@@ -1,10 +1,11 @@
 #include "Arduino.h"
 #include "Board.h"
-#include <vector>
 #include "Joystick.h"
+#include <vector>
 
 #define ROWS 8
 #define COLS 8
+#define MOVE_DELAY 200 // miliseconds
 
 class Player {
   private:
@@ -26,6 +27,8 @@ class Player {
     Ship getShip(int arrayPosition);
     std::vector<Ship> getShipsList();
 
-    void setCursor(int x, int y);
+    void setCursor(char id, int x, int y);
+    int getCursorX();
+    int getCursorY();
     Joystick joystick;
 };

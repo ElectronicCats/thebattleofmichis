@@ -90,6 +90,39 @@ std::vector<Ship> Player::getShipsList() {
   return ships;
 }
 
-void Player::setCursor(int x, int y) {
-  this->board.setCursor(x, y);
+void Player::setCursor(char id, int x, int y) {
+  static int x_t = x;
+  static int y_t = y;
+  unsigned long time = millis();
+  static unsigned long lastTime = 0;
+
+  if (millis() - lastTime >= MOVE_DELAY) {
+    lastTime = time;
+
+    // LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, CENTER = 4
+    switch (this->joystick.getDirection()) {
+      case 0:
+        if (x_t > 1) x_t--;
+        break;
+      case 1:
+        if (x_t < 8) x_t++;
+        break;
+      case 2:
+        if (y_t > 1) y_t--;
+        break;
+      case 3:
+        if (y_t < 8) y_t++;
+        break;
+    }
+    // Update the cursor position
+    this->board.setCursor(id, x_t, y_t);
+  }
+}
+
+int Player::getCursorX() {
+  return this->board.getCursorX();
+}
+
+int Player::getCursorY() {
+  return this->board.getCursorY();
 }
