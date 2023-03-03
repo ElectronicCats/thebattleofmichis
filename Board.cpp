@@ -186,10 +186,15 @@ void Board::placeShip(Ship ship) {
   }
 }
 
-
-void Board::setCursor(char id, int x, int y) {
+void Board::setCursor(char id, int x, int y, int length) {
   static int x_t = x;
   static int y_t = y;
+
+  // Validates if the line can be displayed
+  if (!(x >= 0 && x <= SHAPE_WIDTH - length)) {
+    x = SHAPE_WIDTH - length + 1;
+  }
+
   cursorX = x;
   cursorY = y;
   unsigned long time = millis();
@@ -199,7 +204,8 @@ void Board::setCursor(char id, int x, int y) {
 
   // If the cursor has moved, remove the old one
   if (x != x_t || y != y_t) {
-    Board::setPixel(id, x_t, y_t, pixel);
+    // Board::setPixel(id, x_t, y_t, pixel);
+    Board::setHorizontalLine(id, x_t, y_t, length, pixel);
     x_t = x;
     y_t = y;
     pixel = Board::getPixel(id, x, y);
@@ -210,13 +216,16 @@ void Board::setCursor(char id, int x, int y) {
   }
 
   // Blink the cursor
-  if (time - lastTime > CURSOR_DELAY_TIME) {
-    state = !state;
-    lastTime = time;
+  // if (time - lastTime > CURSOR_DELAY_TIME) {
+  //   state = !state;
+  //   lastTime = time;
 
-    Board::setPixel(id, x_t, y_t, state ? 3 : pixel);
-    Board::print();
-  }
+  //   Board::setPixel(id, x_t, y_t, state ? 3 : pixel);
+  //   Board::print();
+  // }
+
+  Board::setHorizontalLine(id, x_t, y_t, length, Red);
+  Board::print();
 }
 
 int Board::getCursorX() {
@@ -234,4 +243,13 @@ int Board::getPixel(char id, int x, int y) {
 
 void Board::setPixel(char id, int x, int y, int value) {
   id == 'm' ? main[y - 1][x - 1] = value : enemy[y - 1][x - 1] = value;
+}
+
+void Board::setHorizontalLine(char id, int x, int y, int length, int color) {
+  for (int i = 0; i < length; i++) {
+    int x_t = x + i;
+    if (x_t >= 0 && x_t <= SHAPE_WIDTH) {
+      Board::setPixel(id, x_t, y, color);
+    }
+  }
 }

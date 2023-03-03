@@ -29,6 +29,7 @@ class Board {
     int cursorX;
     int cursorY;
     void serialPrint(int **matrix);
+    enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
 
   public:
     int **main;
@@ -38,9 +39,10 @@ class Board {
     void illuminate(char id, int **matrix);
     void scroller();
     void placeShip(Ship ship);
-    void setCursor(char id, int x, int y); // id = 'm' for main board, 'e' for enemy board
+    void setCursor(char id, int x, int y, int length); // id = 'm' for main board, 'e' for enemy board
     int getCursorX();
     int getCursorY();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
+    void setHorizontalLine(char id, int x, int y, int length, int color);
 };
