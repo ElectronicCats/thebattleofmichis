@@ -102,16 +102,16 @@ void Player::setCursor(char id, int x, int y) {
     // LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, CENTER = 4
     switch (this->joystick.getDirection()) {
       case 0:
-        x_t--;
+        if (x_t > 1) x_t--;
         break;
       case 1:
-        x_t++;
+        if (x_t < 8) x_t++;
         break;
       case 2:
-        y_t--;
+        if (y_t > 1) y_t--;
         break;
       case 3:
-        y_t++;
+        if (y_t < 8) y_t++;
         break;
     }
     // Update the cursor position
