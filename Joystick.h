@@ -12,7 +12,7 @@ class Joystick {
   private:
     int yValue;
     int xValue;
-    enum direction_t { LEFT, RIGHT, UP, DOWN, CENTER };
+    enum direction_t { LEFT, RIGHT, UP, DOWN, CENTER }; // LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, CENTER = 4
     direction_t direction;
 
   public:

@@ -91,5 +91,30 @@ std::vector<Ship> Player::getShipsList() {
 }
 
 void Player::setCursor(char id, int x, int y) {
-  this->board.setCursor(id, x, y);
+  static int x_t = x;
+  static int y_t = y;
+  unsigned long time = millis();
+  static unsigned long lastTime = 0;
+
+  if (millis() - lastTime >= MOVE_DELAY) {
+    lastTime = time;
+
+    // LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, CENTER = 4
+    switch (this->joystick.getDirection()) {
+      case 0:
+        x_t--;
+        break;
+      case 1:
+        x_t++;
+        break;
+      case 2:
+        y_t--;
+        break;
+      case 3:
+        y_t++;
+        break;
+    }
+    // Update the cursor position
+    this->board.setCursor(id, x_t, y_t);
+  }
 }

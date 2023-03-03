@@ -14,7 +14,7 @@ void Game::start() {
     // Logic game goes here
     player1.joystick.loop();
 
-    player1.setCursor('e', 2, 6);
+    player1.setCursor('e', 4, 4);
 
     if (player1.joystick.button.isPressed()) {
       counter++;
@@ -22,7 +22,6 @@ void Game::start() {
 
     if (millis() - lastTime >= 200) {
       lastTime = millis();
-      Serial.println("Counter: " + String(counter));
       player1.joystick.printDirection();
     }
   }

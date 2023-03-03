@@ -5,6 +5,7 @@
 
 #define ROWS 8
 #define COLS 8
+#define MOVE_DELAY 200 // miliseconds
 
 class Player {
   private:
