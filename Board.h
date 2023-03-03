@@ -26,6 +26,8 @@ class Board {
     int cols;
     void initMainBoard();
     void initEnemyBoard();
+    int cursorX;
+    int cursorY;
 
   public:
     int **main;
@@ -36,7 +38,8 @@ class Board {
     void scroller();
     void placeShip(Ship ship);
     void setCursor(char id, int x, int y); // id = 'm' for main board, 'e' for enemy board
-    void removeCursor(char id, int x, int y);
+    int getCursorX();
+    int getCursorY();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
 };

@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "Board.h"
-#include <vector>
 #include "Joystick.h"
+#include <vector>
 
 #define ROWS 8
 #define COLS 8
@@ -28,5 +28,7 @@ class Player {
     std::vector<Ship> getShipsList();
 
     void setCursor(char id, int x, int y);
+    int getCursorX();
+    int getCursorY();
     Joystick joystick;
 };

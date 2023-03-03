@@ -118,3 +118,11 @@ void Player::setCursor(char id, int x, int y) {
     this->board.setCursor(id, x_t, y_t);
   }
 }
+
+int Player::getCursorX() {
+  return this->board.getCursorX();
+}
+
+int Player::getCursorY() {
+  return this->board.getCursorY();
+}

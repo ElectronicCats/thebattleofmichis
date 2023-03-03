@@ -40,6 +40,8 @@ Board::Board(int rows, int cols) {
   this->cols = cols;
   this->main = new int*[rows];
   this->enemy = new int*[rows];
+  this->cursorX = 0;
+  this->cursorY = 0;
 
   // Fill the main board with 0
   for (int row = 0; row < rows; row++) {
@@ -209,29 +211,41 @@ void Board::placeShip(Ship ship) {
 void Board::setCursor(char id, int x, int y) {
   static int x_t = x;
   static int y_t = y;
+  cursorX = x;
+  cursorY = y;
   unsigned long time = millis();
   static unsigned long lastTime = time;
   static bool state = false;
+  static int pixel = Board::getPixel(id, x, y); // Saves the color of the current pixel
 
+  // If the cursor has moved, remove the old one
   if (x != x_t || y != y_t) {
-    Board::removeCursor(id, x_t, y_t);
+    Board::setPixel(id, x_t, y_t, pixel);
     x_t = x;
     y_t = y;
+    pixel = Board::getPixel(id, x, y);
+    cursorX = x;
+    cursorY = y;
     state = false;
     lastTime = time;
   }
 
+  // Blink the cursor
   if (time - lastTime > CURSOR_DELAY_TIME) {
     state = !state;
     lastTime = time;
 
-    Board::setPixel(id, x_t, y_t, state ? 3 : 0);
+    Board::setPixel(id, x_t, y_t, state ? 3 : pixel);
     Board::print();
   }
 }
 
-void Board::removeCursor(char id, int x, int y) {
-  Board::setPixel(id, x, y, 0);
+int Board::getCursorX() {
+  return cursorX;
+}
+
+int Board::getCursorY() {
+  return cursorY;
 }
 
 // id = 'm' for main board, 'e' for enemy board
