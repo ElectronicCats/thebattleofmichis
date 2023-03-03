@@ -190,19 +190,6 @@ void Board::illuminate() {
   FastLED.show();
 }
 
-void Board::scroller() {
-  FastLED.clear();
-  Spriteopen.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-
-  for (int i = 0; i < 224; i++) {
-    FastLED.clear();
-    EnemySprites.UpdateSprites();
-    EnemySprites.RenderSprites();
-    FastLED.show();
-    delay(50);
-  }
-}
-
 /**
   * Takes an object of type Ship and and change the values
   * of the coordinates from zero to one on the board
