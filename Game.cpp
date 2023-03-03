@@ -14,8 +14,7 @@ void Game::start() {
     // Logic game goes here
     player1.joystick.loop();
 
-    //player1.setCursor('e', 4, 4);
-    player1.setCursor('m', 4, 4, 5, 1);
+    Game::placeShip(2);
 
     if (player1.joystick.button.isPressed()) {
       counter++;
@@ -58,4 +57,19 @@ void Game::setup() {
   delay(1000);
   player1.hit(8, 8);
   player1.printBoard();
+}
+
+void Game::placeShip(int length) {
+  int orientation = 0;
+  for (;;) {
+    player1.joystick.loop();
+
+    if (player1.joystick.button.isPressed()) {
+      orientation++;
+      if (orientation > 1) {
+        orientation = 0;
+      }
+    }
+    player1.setCursor('m', 4, 4, length, orientation);
+  }
 }
