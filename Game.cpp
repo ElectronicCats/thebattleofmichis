@@ -6,16 +6,22 @@ Game::Game() {
 
 void Game::start() {
   Game::setup();
+  unsigned long time = millis();
+  static unsigned long lastTime = time;
   int counter = 0;
 
   for(;;) {
     // Logic game goes here
-    player1.setCursor(2, 6);
     player1.joystick.button.loop();
+    player1.setCursor('e', 2, 6);
     if (player1.joystick.button.isPressed()) {
       counter++;
     }
-    Serial.println("Counter: " + String(counter));
+
+    if (millis() - lastTime >= 200) {
+      lastTime = millis();
+      Serial.println("Counter: " + String(counter));
+    }
   }
 }
 

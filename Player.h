@@ -26,6 +26,6 @@ class Player {
     Ship getShip(int arrayPosition);
     std::vector<Ship> getShipsList();
 
-    void setCursor(int x, int y);
+    void setCursor(char id, int x, int y);
     Joystick joystick;
 };

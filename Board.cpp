@@ -65,6 +65,7 @@ Board::Board(int rows, int cols) {
 void Board::print() {
   Board::illuminate();
 
+  /*
   // Print the main board
   Serial.print("  |");
   for (int i = 1; i <= cols; i++) {
@@ -115,6 +116,7 @@ void Board::print() {
     Serial.println("--------");
   }
   Serial.println("");
+  */
 }
 
 void Board::initMainBoard() {
@@ -129,8 +131,8 @@ void Board::initEnemyBoard() {
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
   EnemySprites.AddSprite(&EnemySpriteBoard);
-  EnemySprites.AddSprite(&Spriteopen);
-  Board::scroller();
+  //EnemySprites.AddSprite(&Spriteopen);
+  //Board::scroller();
 }
 
 
@@ -204,15 +206,18 @@ void Board::placeShip(Ship ship) {
 }
 
 
-void Board::setCursor(int x, int y) {
-  // TODO: Make this with millis
-  int pixel = Board::getPixel('m', x, y);
-  Board::setPixel('m', x, y, 3);
-  Board::print();
-  delay(CURSOR_DELAY_TIME);
-  Board::setPixel('m', x, y, pixel);
-  Board::print();
-  delay(CURSOR_DELAY_TIME);
+void Board::setCursor(char id, int x, int y) {
+  unsigned long time = millis();
+  static unsigned long lastTime = time;
+  static bool state = false;
+
+  if (time - lastTime > CURSOR_DELAY_TIME) {
+    state = !state;
+    lastTime = time;
+
+    Board::setPixel(id, x, y, state ? 3 : 0);
+    Board::print();
+  }
 }
 
 void Board::removeCursor(int x, int y) {

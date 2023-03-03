@@ -90,6 +90,6 @@ std::vector<Ship> Player::getShipsList() {
   return ships;
 }
 
-void Player::setCursor(int x, int y) {
-  this->board.setCursor(x, y);
+void Player::setCursor(char id, int x, int y) {
+  this->board.setCursor(id, x, y);
 }
