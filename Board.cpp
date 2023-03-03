@@ -207,21 +207,31 @@ void Board::placeShip(Ship ship) {
 
 
 void Board::setCursor(char id, int x, int y) {
+  static int x_t = x;
+  static int y_t = y;
   unsigned long time = millis();
   static unsigned long lastTime = time;
   static bool state = false;
+
+  if (x != x_t || y != y_t) {
+    Board::removeCursor(id, x_t, y_t);
+    x_t = x;
+    y_t = y;
+    state = false;
+    lastTime = time;
+  }
 
   if (time - lastTime > CURSOR_DELAY_TIME) {
     state = !state;
     lastTime = time;
 
-    Board::setPixel(id, x, y, state ? 3 : 0);
+    Board::setPixel(id, x_t, y_t, state ? 3 : 0);
     Board::print();
   }
 }
 
-void Board::removeCursor(int x, int y) {
-
+void Board::removeCursor(char id, int x, int y) {
+  Board::setPixel(id, x, y, 0);
 }
 
 // id = 'm' for main board, 'e' for enemy board
