@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "Ship.h"
 #include <FastLED.h>
+#include <vector>
 
 #include <LEDMatrix.h>    // https://github.com/AaronLiddiment/LEDMatrix.git
 #include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
