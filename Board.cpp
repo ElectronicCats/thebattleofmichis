@@ -1,6 +1,7 @@
 #include "Board.h"
 
-cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> boardUp;
+cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> mainBoardUp;
+cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> enemyBoardUp;
 
 const uint8_t SpriteBoardData[] = {
   0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
@@ -31,9 +32,8 @@ const uint8_t SpriteopenData[] = {
 const struct CRGB SpriteopenCols[15] = { CRGB(255,186,0), CRGB(51,51,51), CRGB(179,179,179), CRGB(186,63,208), CRGB(255,255,255), CRGB(128,128,128), CRGB(115,99,86), CRGB(40,171,227), CRGB(39,171,229), CRGB(0,0,0), CRGB(0,0,0), CRGB(0,0,0), CRGB(0,0,0), CRGB(0,0,0), CRGB(0,0,0) };
 cSprite Spriteopen(224, 8, SpriteopenData, 1, _4BIT, SpriteopenCols);
 
-
-
-cLEDSprites Sprites(&boardUp);
+cLEDSprites MainSprites(&mainBoardUp);
+cLEDSprites EnemySprites(&enemyBoardUp);
 
 Board::Board(int rows, int cols) {
   this->rows = rows;
@@ -65,6 +65,7 @@ Board::Board(int rows, int cols) {
 void Board::print() {
   Board::illuminate();
 
+  // Print the main board
   Serial.print("  |");
   for (int i = 1; i <= cols; i++) {
       Serial.print(" ");
@@ -88,24 +89,47 @@ void Board::print() {
     }
     Serial.println("--------");
   }
+  Serial.println("");
 
+  // Print the enemy board
+  Serial.print("  |");
+  for (int i = 1; i <= cols; i++) {
+      Serial.print(" ");
+      Serial.print(i);
+      Serial.print(" |");
+  }
+  Serial.println("\n  -----------------------------------------");
+  for (int row = 0; row < rows; row++) {
+    Serial.print((char)('A' + row % 26)); // Increase the letter -> A, B, C, ...
+    Serial.print(" |");
+    for (int col = 0; col < cols; col++) {
+        Serial.print(" ");
+        Serial.print(enemy[row][col]);
+        Serial.print(" |");
+    }
+    Serial.println();
+    Serial.print("  ");
+    for (int i = 0; i <= cols; i++) {
+        Serial.print("---");
+    }
+    Serial.println("--------");
+  }
   Serial.println("");
 }
 
 void Board::initMainBoard() {
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
-  Sprites.AddSprite(&MainSpriteBoard);
+  MainSprites.AddSprite(&MainSpriteBoard);
 }
 
 void Board::initEnemyBoard() {
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(boardUp[0], boardUp.Size());
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(enemyBoardUp[0], enemyBoardUp.Size());
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
-  Sprites.AddSprite(&MainSpriteBoard);
-  Sprites.AddSprite(&Spriteopen);
-
+  EnemySprites.AddSprite(&EnemySpriteBoard);
+  EnemySprites.AddSprite(&Spriteopen);
   Board::scroller();
 }
 
@@ -117,8 +141,8 @@ void Board::scroller() {
 
   for(int i = 0; i < 224; i++){
     FastLED.clear();
-    Sprites.UpdateSprites();
-    Sprites.RenderSprites();
+    EnemySprites.UpdateSprites();
+    EnemySprites.RenderSprites();
     FastLED.show();
     delay(50);
   }  
@@ -159,9 +183,24 @@ void Board::illuminate() {
     }
   }
 
-  Sprites.UpdateSprites();
-  Sprites.RenderSprites();
+  MainSprites.UpdateSprites();
+  MainSprites.RenderSprites();
+  EnemySprites.UpdateSprites();
+  EnemySprites.RenderSprites();
   FastLED.show();
+}
+
+void Board::scroller() {
+  FastLED.clear();
+  Spriteopen.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
+
+  for (int i = 0; i < 224; i++) {
+    FastLED.clear();
+    EnemySprites.UpdateSprites();
+    EnemySprites.RenderSprites();
+    FastLED.show();
+    delay(50);
+  }
 }
 
 /**
@@ -180,11 +219,11 @@ void Board::placeShip(Ship ship) {
 
 void Board::setCursor(int x, int y) {
   // TODO: Make this with millis
-  int pixel = Board::getPixel(x, y);
-  Board::setPixel(x, y, 3);
+  int pixel = Board::getPixel('m', x, y);
+  Board::setPixel('m', x, y, 3);
   Board::print();
   delay(CURSOR_DELAY_TIME);
-  Board::setPixel(x, y, pixel);
+  Board::setPixel('m', x, y, pixel);
   Board::print();
   delay(CURSOR_DELAY_TIME);
 }
@@ -193,10 +232,11 @@ void Board::removeCursor(int x, int y) {
 
 }
 
-int Board::getPixel(int x, int y) {
-  return this->main[y - 1][x - 1];
+// id = 'm' for main board, 'e' for enemy board
+int Board::getPixel(char id, int x, int y) {
+  return id == 'm' ? main[y - 1][x - 1] : enemy[y - 1][x - 1];
 }
 
-void Board::setPixel(int x, int y, int value) {
-  this->main[y - 1][x - 1] = value;
+void Board::setPixel(char id, int x, int y, int value) {
+  id == 'm' ? main[y - 1][x - 1] = value : enemy[y - 1][x - 1] = value;
 }

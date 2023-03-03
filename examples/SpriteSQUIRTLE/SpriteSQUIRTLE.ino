@@ -32,7 +32,7 @@ const struct CRGB SpritesqCols[31] = { CRGB(247,97,0), CRGB(192,57,0), CRGB(95,2
 cSprite Spritesq(74, 8, SpritesqData, 1, _5BIT, SpritesqCols);
 
 
-cLEDSprites Sprites(&leds);
+cLEDSprites MainSprites(&leds);
 
 
 
@@ -47,7 +47,7 @@ void setup()
   FastLED.show();
 
   //Spritesq.SetPositionFrameMotionOptions(0/*X*/, -8/*Y*/, 0/*Frame*/, 0/*FrameRate*/, 0/*XChange*/, 1/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-  Sprites.AddSprite(&Spritesq);
+  MainSprites.AddSprite(&Spritesq);
 }
 
 int y_pos = -8;
@@ -75,8 +75,8 @@ void loop()
           delay(2000);
         }
         
-        Sprites.UpdateSprites();
-        Sprites.RenderSprites();
+        MainSprites.UpdateSprites();
+        MainSprites.RenderSprites();
         FastLED.show();
         delay(50);
       }
