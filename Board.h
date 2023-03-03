@@ -28,13 +28,14 @@ class Board {
     void initEnemyBoard();
     int cursorX;
     int cursorY;
+    void serialPrint(int **matrix);
 
   public:
     int **main;
     int **enemy;
     Board(int rows, int cols);
     void print();
-    void illuminate();
+    void illuminate(char id, int **matrix);
     void scroller();
     void placeShip(Ship ship);
     void setCursor(char id, int x, int y); // id = 'm' for main board, 'e' for enemy board

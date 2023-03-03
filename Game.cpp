@@ -23,8 +23,9 @@ void Game::start() {
 
     if (millis() - lastTime >= 200) {
       lastTime = millis();
-      player1.joystick.printDirection();
-      Serial.println("Cursor position: " + String(player1.getCursorX()) + ", " + String(player1.getCursorY()));
+      Serial.println("Counter: " + String(counter));
+      // player1.joystick.printDirection();
+      // Serial.println("Cursor position: " + String(player1.getCursorX()) + ", " + String(player1.getCursorY()));
     }
   }
 }
