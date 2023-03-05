@@ -191,7 +191,7 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
   static int y_t = y;
   static int orientation_t = orientation;
 
-  // Validates if the line can be displayed
+  // Validates if the line can be displayed, if not, it will be displayed in the last position
   if (!(x >= 0 && x <= SHAPE_WIDTH - length) && orientation_t == Horizontal) {
     x = SHAPE_WIDTH - length + 1;
   }
@@ -199,58 +199,28 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
     y = SHAPE_HEIGHT - length + 1;
   }
 
+  // Update the global variables
   cursorX = x;
   cursorY = y;
-  unsigned long time = millis();
-  static unsigned long lastTime = time;
-  static bool state = false;
 
-  // Save the colors of the current line of pixels
-  if (pixels.size() == 0) {
-    Serial.println("Initializing pixels...");
-    if (orientation == Horizontal) {
-      for (int i = 0; i < length; i++) {
-        Serial.println("Adding pixel" + String(Board::getPixel(id, x_t + i, y_t)));
-        pixels.push_back(Board::getPixel(id, x_t + i, y_t));
-      }
-    } else if (orientation == Vertical) {
-      for (int i = 0; i < length; i++) {
-        pixels.push_back(Board::getPixel(id, x_t, y_t + i));
+  // Backup the current colors of the board
+  if (colors.size() == 0) {
+    colors.reserve(SHAPE_WIDTH * SHAPE_HEIGHT); // reserve memory for all pixels
+
+    for (int i = 1; i <= rows; i++) {
+      for (int j = 1; j <= cols; j++) {
+        colors.push_back(Board::getPixel(id, i, j));
       }
     }
   }
 
-  if (millis() - lastTime > CURSOR_DELAY_TIME) {
-    lastTime = millis();
-    for (auto &i : pixels) {
-      Serial.print("[" + String(i) + "]");
-    }
-    Serial.println("");
-  }
-
-  // If the cursor has moved, remove the old one
+  // If the cursor has moved, or the orientation has changed
   if (x != x_t || y != y_t || orientation != orientation_t) {
-    // Restore the original colors of the line of pixels
-    if (orientation_t == Horizontal) {
-      for (int i = 0; i < length; i++) {
-        // Serial.println("Restored: " + String(Board::getPixel(id, x_t + i, y_t)));
-        Board::setPixel(id, x_t + i, y_t, pixels[i]);
-      }
-    } else if (orientation_t == Vertical) {
-      for (int i = 0; i < length; i++) {
-        Board::setPixel(id, x_t, y_t + i, pixels[i]);
-      }
-    }
-
-    // Update the new colors
-    pixels.clear();
-    if (orientation_t == Horizontal) {
-      for (int i = 0; i < length; i++) {
-        pixels.push_back(Board::getPixel(id, x + i, y));
-      }
-    } else if (orientation_t == Vertical) {
-      for (int i = 0; i < length; i++) {
-        pixels.push_back(Board::getPixel(id, x, y + i));
+    // Restore the previous colors
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        int index = i * cols + j;
+        Board::setPixel(id, i + 1, j + 1, colors[index]);
       }
     }
 
@@ -260,23 +230,13 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
     cursorX = x;
     cursorY = y;
     orientation_t = orientation;
-    state = false;
-    lastTime = time;
   }
 
-  // Blink the cursor
-  // if (time - lastTime > CURSOR_DELAY_TIME) {
-  //   state = !state;
-  //   lastTime = time;
-
-  //   Board::setPixel(id, x_t, y_t, state ? 3 : pixel);
-  //   Board::print();
-  // }
-
+  // Display the cursor
   if (orientation_t == Horizontal) {
-    Board::setHorizontalLine(id, x_t, y_t, length, Green);
+    Board::setHorizontalLine(id, x_t, y_t, length, Red);
   } else if (orientation_t == Vertical) {
-    Board::setVerticalLine(id, x_t, y_t, length, Green);
+    Board::setVerticalLine(id, x_t, y_t, length, Red);
   }
 
   Board::print();
