@@ -30,13 +30,14 @@ class Board {
     int cursorX;
     int cursorY;
     void serialPrint(int **matrix);
-    enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
-    std::vector<int> colors;
+    std::vector<int> mainColors;
+    std::vector<int> enemyColors;
 
   public:
     int **main;
     int **enemy;
     Board(int rows, int cols);
+    enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
     enum Orientation { Horizontal = 0, Vertical = 1 };
     void print();
     void illuminate(char id, int **matrix);

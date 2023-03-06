@@ -28,17 +28,22 @@ void Player::addShip(Ship ship) {
   this->ships.push_back(ship);
 }
 
-void Player::hit(int x, int y) {
+bool Player::hit(int x, int y) {
+  bool isHit = false;
+
   for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
       Player::isShipSunken(ship);
       this->board.setPixel('e', x, y, 3);
+      isHit = true;
     } else {
-      if (this->board.getPixel('m', x, y) != 3) {
+      if (this->board.getPixel('m', x, y) != Board::Green) {
         this->board.setPixel('e', x, y, 2);
       }
     }
   }
+
+  return isHit;
 }
 
 /**

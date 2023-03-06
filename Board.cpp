@@ -204,12 +204,12 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
   cursorY = y;
 
   // Backup the current colors of the board
-  if (colors.size() == 0) {
-    colors.reserve(SHAPE_WIDTH * SHAPE_HEIGHT); // reserve memory for all pixels
+  if (mainColors.size() == 0) {
+    mainColors.reserve(SHAPE_WIDTH * SHAPE_HEIGHT); // reserve memory for all pixels
 
     for (int i = 1; i <= rows; i++) {
       for (int j = 1; j <= cols; j++) {
-        colors.push_back(Board::getPixel(id, i, j));
+        mainColors.push_back(Board::getPixel(id, i, j));
       }
     }
   }
@@ -220,7 +220,7 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         int index = i * cols + j;
-        Board::setPixel(id, i + 1, j + 1, colors[index]);
+        Board::setPixel(id, i + 1, j + 1, mainColors[index]);
       }
     }
 
@@ -251,7 +251,7 @@ int Board::getCursorY() {
 }
 
 void Board::resetColors() {
-  colors.clear();
+  mainColors.clear();
 }
 
 // id = 'm' for main board, 'e' for enemy board
@@ -260,7 +260,9 @@ int Board::getPixel(char id, int x, int y) {
 }
 
 void Board::setPixel(char id, int x, int y, int value) {
+  int index = x * cols + y;
   id == 'm' ? main[y - 1][x - 1] = value : enemy[y - 1][x - 1] = value;
+  // id == 'm' ? mainColors[index] = value : enemyColors[index] = value;
 }
 
 void Board::setHorizontalLine(char id, int x, int y, int length, int color) {
