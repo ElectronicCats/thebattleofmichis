@@ -181,7 +181,7 @@ void Board::illuminate(char id, int **matrix) {
 void Board::placeShip(Ship ship) {
   for (int row = ship.getStartY(); row <= ship.getEndY(); row++) {
     for (int col = ship.getStartX(); col <= ship.getEndX(); col++) {
-      main[row][col] = 1;
+      main[row][col] = Green;
     }
   }
 }
@@ -248,6 +248,10 @@ int Board::getCursorX() {
 
 int Board::getCursorY() {
   return cursorY;
+}
+
+void Board::resetColors() {
+  colors.clear();
 }
 
 // id = 'm' for main board, 'e' for enemy board

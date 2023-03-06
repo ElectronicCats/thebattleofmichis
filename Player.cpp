@@ -1,7 +1,14 @@
 #include "Player.h"
 
-Player::Player() : board(ROWS, COLS) {
+Player::Player() : board(ROWS, COLS), button(BUTTON_PIN) {
   sunkenShips = 0;
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  this->button.setDebounceTime(DEBOUNCE_DELAY);
+}
+
+void Player::loop() {
+  this->joystick.loop();
+  this->button.loop();
 }
 
 void Player::printBoard() {
@@ -124,4 +131,8 @@ int Player::getCursorX() {
 
 int Player::getCursorY() {
   return this->board.getCursorY();
+}
+
+void Player::resetColors() {
+  this->board.resetColors();
 }
