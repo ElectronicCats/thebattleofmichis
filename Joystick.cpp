@@ -5,6 +5,9 @@ Joystick::Joystick() : button(SW_PIN) {
   this->button.setDebounceTime(DEBOUNCE_DELAY);
 }
 
+// Loop is required to listen to the joystick events
+// and update the direction variable, it must be called
+// in the loop where the joystick is used
 void Joystick::loop() {
   this->button.loop();
   this->yValue = analogRead(VRY_PIN);
@@ -23,6 +26,8 @@ void Joystick::loop() {
   }
 }
 
+// Return the direction of the joystick
+// LEFT = 0, RIGHT = 1, UP = 2, DOWN = 3, CENTER = 4
 Joystick::direction_t Joystick::getDirection() {
   return this->direction;
 }

@@ -1,7 +1,14 @@
 #include "Player.h"
 
-Player::Player() : board(ROWS, COLS) {
+Player::Player() : board(ROWS, COLS), button(BUTTON_PIN) {
   sunkenShips = 0;
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  this->button.setDebounceTime(DEBOUNCE_DELAY);
+}
+
+void Player::loop() {
+  this->joystick.loop();
+  this->button.loop();
 }
 
 void Player::printBoard() {
@@ -21,17 +28,22 @@ void Player::addShip(Ship ship) {
   this->ships.push_back(ship);
 }
 
-void Player::hit(int x, int y) {
+bool Player::hit(int x, int y) {
+  bool isHit = false;
+
   for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
       Player::isShipSunken(ship);
       this->board.setPixel('e', x, y, 3);
+      isHit = true;
     } else {
-      if (this->board.getPixel('m', x, y) != 3) {
+      if (this->board.getPixel('m', x, y) != Board::Green) {
         this->board.setPixel('e', x, y, 2);
       }
     }
   }
+
+  return isHit;
 }
 
 /**
@@ -124,4 +136,8 @@ int Player::getCursorX() {
 
 int Player::getCursorY() {
   return this->board.getCursorY();
+}
+
+void Player::resetColors() {
+  this->board.resetColors();
 }

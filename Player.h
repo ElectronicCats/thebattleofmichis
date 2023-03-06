@@ -1,11 +1,13 @@
 #include "Arduino.h"
 #include "Board.h"
 #include "Joystick.h"
-// #include <vector>
 
-#define ROWS 8
-#define COLS 8
-#define MOVE_DELAY 200 // miliseconds
+#define ROWS            8
+#define COLS            8
+#define MOVE_DELAY      200 // miliseconds
+
+#define BUTTON_PIN      32 // Pull-up resistor
+#define DEBOUNCE_DELAY  50 // miliseconds
 
 class Player {
   private:
@@ -15,11 +17,12 @@ class Player {
 
   public:
     Player();
+    void loop();
     void printBoard();
 
     void placeShip(Ship ship); // Place a ship on the board
     void addShip(Ship ship); // Add a ship to the list of ships
-    void hit(int x, int y);
+    bool hit(int x, int y);
     bool isShipSunken(Ship ship); // Increase the number of sunken ships
     int getSunkenShips();
     bool createShip(int startX, int startY, int endX, int endY);
@@ -30,5 +33,7 @@ class Player {
     void setCursor(char id, int x, int y, int length, int orientation);
     int getCursorX();
     int getCursorY();
+    void resetColors();
     Joystick joystick;
+    ezButton button;
 };

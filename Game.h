@@ -5,6 +5,8 @@ class Game {
   private:
     Player player1;
     Player player2;
+    int Vertical;
+    int Horizontal;
 
   public:
     Game();

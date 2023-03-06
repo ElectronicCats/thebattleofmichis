@@ -12,7 +12,7 @@
 #define COLOR_ORDER       GRB // GRB ordering is typical for the WS2812B chipset
 #define CHIPSET           WS2812B
 
-#define BRIGHTNESS        10
+#define BRIGHTNESS        3
 #define CURSOR_DELAY_TIME 200 // Miliseconds
 
 #define SHAPE_WIDTH       8
@@ -30,14 +30,15 @@ class Board {
     int cursorX;
     int cursorY;
     void serialPrint(int **matrix);
-    enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
-    enum Orientation { Horizontal = 0, Vertical = 1 };
-    std::vector<int> pixels;
+    std::vector<int> mainColors;
+    std::vector<int> enemyColors;
 
   public:
     int **main;
     int **enemy;
     Board(int rows, int cols);
+    enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
+    enum Orientation { Horizontal = 0, Vertical = 1 };
     void print();
     void illuminate(char id, int **matrix);
     void scroller();
@@ -45,6 +46,7 @@ class Board {
     void setCursor(char id, int x, int y, int length, int orientation);
     int getCursorX();
     int getCursorY();
+    void resetColors();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
     void setHorizontalLine(char id, int x, int y, int length, int color);
