@@ -21,6 +21,10 @@ Los jugadores manejan un tablero de océano y un tablero de tiro; cada uno divid
 ## Thanks
 - Electronic Cats Team
 
+## Maker Faire Mexicali
+
+Creado para la MakerFaire Mexicali 2023 10 y 11 de Marzo
+
 # License
 
 ![OpenSourceLicense](https://github.com/ElectronicCats/AjoloteBoard/raw/master/OpenSourceLicense.png)
@@ -32,5 +36,3 @@ Firmware released under an GNU AGPL v3.0 license. See the LICENSE file for more 
 Hardware released under an CERN Open Hardware Licence v1.2. See the LICENSE_HARDWARE file for more information.
 
 Electronic Cats is a registered trademark, please do not use if you sell these PCBs.
-
-30 Octuber 2019
