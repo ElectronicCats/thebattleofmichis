@@ -3,7 +3,7 @@
 
 #define VRX_PIN         33
 #define VRY_PIN         25
-#define SW_PIN          27 // Pull-up resistor
+#define SW_PIN          27 // Pull-up resistor in software
 #define DEBOUNCE_DELAY  50 // miliseconds
 #define THRESHOLD_LOW   1000
 #define THRESHOLD_HIGH  3000

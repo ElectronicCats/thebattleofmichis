@@ -6,7 +6,7 @@
 #define COLS            8
 #define MOVE_DELAY      200 // miliseconds
 
-#define BUTTON_PIN      32 // Pull-up resistor
+#define BUTTON_PIN      32 // Pull-up resistor in software
 #define DEBOUNCE_DELAY  50 // miliseconds
 
 class Player {
