@@ -2,6 +2,8 @@
 
 Joystick::Joystick() : button(SW_PIN) {
   pinMode(SW_PIN, INPUT_PULLUP);
+  pinMode(VRX_PIN, INPUT);
+  pinMode(VRY_PIN, INPUT);
   this->button.setDebounceTime(DEBOUNCE_DELAY);
 }
 

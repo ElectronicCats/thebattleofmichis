@@ -20,9 +20,9 @@ uint8_t incoming_y;
 uint8_t incoming_color;
 
 typedef struct struct_message {
-    uint8_t x_p;
-    uint8_t y_p;
-    uint8_t color_p;
+    uint8_t x;
+    uint8_t y;
+    uint8_t color;
 } struct_message;
 
 // Create a struct_message called outgoing
@@ -34,7 +34,7 @@ struct_message incoming;
 esp_now_peer_info_t peerInfo;
 
 // Variable to store if sending data was successful
-String success;
+bool success;
 
 void setup() {
   Serial.begin(115200);
@@ -72,35 +72,27 @@ void setup() {
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(OnDataRecv);
 
-  // setupShips();
+  setupShips();
 }
 
 void loop() {
-  // Set values to send
-  outgoing.x_p = 2;
-  outgoing.y_p = 2;
-  outgoing.color_p = 255;
+  player.loop();
+  player.setCursor('e', 4, 4, 1, Horizontal);
 
-  // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-   
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
+  if (player.button.isPressed()) {
+    outgoing.x = player.getCursorX();
+    outgoing.y = player.getCursorY();
+    outgoing.color = 255;
+
+    // Send message via ESP-NOW
+    esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+
+    Serial.println("x: " + String(player.getCursorX()) + " y: " + String(player.getCursorY()));
+    Serial.println("Is hit: " + String(player.hit(player.getCursorX(), player.getCursorY())));
+
+    // updateDisplay();
+    player.resetColors();
   }
-  else {
-    Serial.println("Error sending the data");
-  }
-  updateDisplay();
-  delay(10000);
-
-  // player.loop();
-  // player.setCursor('e', 4, 4, 1, Horizontal);
-
-  // if (player.button.isPressed()) {
-  //   Serial.println("x: " + String(player.getCursorX()) + " y: " + String(player.getCursorY()));
-  //   Serial.println("Is hit: " + String(player.hit(player.getCursorX(), player.getCursorY())));
-  //   player.resetColors();
-  // }
 }
 
 void setupShips() {
@@ -149,14 +141,8 @@ void placeShip(int length) {
 }
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-  if (status ==0){
-    success = "Delivery Success :)";
-  }
-  else{
-    success = "Delivery Fail :(";
-  }
+  success = !status;
+  Serial.println("\r\nLast Packet Send Status:\t" + String(success));
 }
 
 // Callback when data is received
@@ -164,21 +150,15 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&incoming, incomingData, sizeof(incoming));
   Serial.print("Bytes received: ");
   Serial.println(len);
-  incoming_x = incoming.x_p;
-  incoming_y = incoming.y_p;
-  incoming_color = incoming.color_p;
+  incoming_x = incoming.x;
+  incoming_y = incoming.y;
+  incoming_color = incoming.color;
 }
 
 void updateDisplay(){
   // Display Readings in Serial Monitor
   Serial.println("INCOMING ");
-  Serial.print("x: ");
-  Serial.print(incoming.x_p);
-  Serial.println(", ");
-  Serial.print("y: ");
-  Serial.print(incoming.y_p);
-  Serial.println(", ");
-  Serial.print("color: ");
-  Serial.print(incoming.color_p);
-  Serial.println();
+  Serial.println("x: " + String(incoming_x));
+  Serial.println("y: " + String(incoming_y));
+  Serial.println("color: " + String(incoming_color));
 }

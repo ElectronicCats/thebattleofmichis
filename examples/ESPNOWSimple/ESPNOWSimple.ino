@@ -21,9 +21,9 @@ String success;
 //Structure example to send data
 //Must match the receiver structure
 typedef struct struct_message {
-    uint8_t x_p;
-    uint8_t y_p;
-    uint8_t color_p;
+    uint8_t x;
+    uint8_t y;
+    uint8_t color;
 } struct_message;
 
 // Create a struct_message called outgoing
@@ -51,9 +51,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&incoming, incomingData, sizeof(incoming));
   Serial.print("Bytes received: ");
   Serial.println(len);
-  incoming_x = incoming.x_p;
-  incoming_y = incoming.y_p;
-  incoming_color = incoming.color_p;
+  incoming_x = incoming.x;
+  incoming_y = incoming.y;
+  incoming_color = incoming.color;
 }
  
 void setup() {
@@ -82,7 +82,7 @@ void setup() {
   
   // Register peer
   memcpy(peerInfo.peer_addr, newMacAddress, 6);
-  peerInfo.channel = 0;  
+  peerInfo.channel = 0;
   peerInfo.encrypt = false;
   
   // Add peer        
@@ -96,9 +96,9 @@ void setup() {
  
 void loop() {
   // Set values to send
-  outgoing.x_p = 2;
-  outgoing.y_p = 2;
-  outgoing.color_p = 127;
+  outgoing.x = 2;
+  outgoing.y = 2;
+  outgoing.color = 127;
 
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
@@ -117,12 +117,12 @@ void updateDisplay(){
   // Display Readings in Serial Monitor
   Serial.println("INCOMING ");
   Serial.print("x: ");
-  Serial.print(incoming.x_p);
+  Serial.print(incoming.x);
   Serial.println(", ");
   Serial.print("y: ");
-  Serial.print(incoming.y_p);
+  Serial.print(incoming.y);
   Serial.println(", ");
   Serial.print("color: ");
-  Serial.print(incoming.color_p);
+  Serial.print(incoming.color);
   Serial.println();
 }

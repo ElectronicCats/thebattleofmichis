@@ -2,7 +2,7 @@
 #include <ezButton.h>
 
 #define VRX_PIN         33
-#define VRY_PIN         25
+#define VRY_PIN         35
 #define SW_PIN          27 // Pull-up resistor in software
 #define DEBOUNCE_DELAY  50 // miliseconds
 #define THRESHOLD_LOW   1000
