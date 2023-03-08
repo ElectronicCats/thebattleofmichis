@@ -17,19 +17,23 @@ uint8_t color;
 // Define variables to store incoming data
 uint8_t incoming_x;
 uint8_t incoming_y;
-uint8_t incoming_color;
+bool incoming_status = false;
+bool incoming_response = false;
+bool incoming_isHit = false;
 
-typedef struct struct_message {
+typedef struct message {
+    bool status;
+    bool response;
     uint8_t x;
     uint8_t y;
-    uint8_t color;
-} struct_message;
+    bool isHit;
+} message;
 
-// Create a struct_message called outgoing
-struct_message outgoing;
+// Create a message called outgoing
+message outgoing;
 
-// Create a struct_message to hold incoming
-struct_message incoming;
+// Create a message to hold incoming
+message incoming;
 
 esp_now_peer_info_t peerInfo;
 
@@ -72,26 +76,47 @@ void setup() {
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(OnDataRecv);
 
-  setupShips();
+  // setupShips();
 }
 
 void loop() {
   player.loop();
   player.setCursor('e', 4, 4, 1, Horizontal);
+  static unsigned long lastTime = millis();
+
+  // Hit recieved
+  if (incoming_status) {
+    Serial.println("INCOMING");
+    printIncomingData();
+    incoming_status = false;
+
+    delay(2000);
+    outgoing.x = 0;
+    outgoing.y = 0;
+    outgoing.status = false;
+    outgoing.response = true;
+    outgoing.isHit = player.hit(incoming_x, incoming_y);
+    esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+    Serial.println("Sent response");
+  }
+
+  // Response of a hit
+  if (incoming_response) {
+    incoming_response = false;
+    Serial.println("\nFrom response");
+    Serial.println("Is hit: " + String(incoming_isHit));
+  }
 
   if (player.button.isPressed()) {
     outgoing.x = player.getCursorX();
     outgoing.y = player.getCursorY();
-    outgoing.color = 255;
+    outgoing.status = true;
+    outgoing.response = false;
+    outgoing.isHit = false;
 
     // Send message via ESP-NOW
     esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-
-    Serial.println("x: " + String(player.getCursorX()) + " y: " + String(player.getCursorY()));
-    Serial.println("Is hit: " + String(player.hit(player.getCursorX(), player.getCursorY())));
-
-    // updateDisplay();
-    player.resetColors();
+    // player.resetColors();
   }
 }
 
@@ -152,13 +177,17 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.println(len);
   incoming_x = incoming.x;
   incoming_y = incoming.y;
-  incoming_color = incoming.color;
+  incoming_status = !incoming.status;
+  incoming_response = !incoming.response;
+  incoming_isHit = !incoming.isHit;
+  Serial.println("Incoming status: " + String(incoming_status));
+  Serial.println("Incoming response: " + String(incoming_response));
 }
 
-void updateDisplay(){
-  // Display Readings in Serial Monitor
-  Serial.println("INCOMING ");
+void printIncomingData(){
   Serial.println("x: " + String(incoming_x));
   Serial.println("y: " + String(incoming_y));
-  Serial.println("color: " + String(incoming_color));
+  Serial.println("hit: " + String(incoming_status));
+  Serial.println("response: " + String(incoming_response));
+  Serial.println("isHit: " + String(incoming_isHit));
 }
