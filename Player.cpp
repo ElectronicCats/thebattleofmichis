@@ -138,6 +138,14 @@ int Player::getCursorY() {
   return this->board.getCursorY();
 }
 
+void Player::resetEnemyColors() {
+  this->board.resetEnemyColors();
+}
+
 void Player::resetColors() {
   this->board.resetColors();
+}
+
+void Player::printScroller() {
+  this->board.scroller();
 }

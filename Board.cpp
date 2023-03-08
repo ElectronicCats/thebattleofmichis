@@ -114,23 +114,33 @@ void Board::initEnemyBoard() {
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear(true);
   EnemySprites.AddSprite(&EnemySpriteBoard);
-  //EnemySprites.AddSprite(&Spriteopen);
-  //Board::scroller();
+  EnemySprites.AddSprite(&Spriteopen);
 }
-
 
 // LED banner test
 void Board::scroller() {
-  FastLED.clear();
-  Spriteopen.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
+  static int counter = 0;
+  static unsigned long lastTime = millis();
 
-  for(int i = 0; i < 224; i++){
+  if (millis() - lastTime > 100) {
+    Serial.println("Counter: " + String(counter));
+    lastTime = millis();
+    counter++;
+    if (counter > 69) {
+      counter = 0;
+    }
+
     FastLED.clear();
     EnemySprites.UpdateSprites();
     EnemySprites.RenderSprites();
     FastLED.show();
-    delay(50);
-  }  
+    Board::print();
+  }
+
+  if (counter == 0) {
+    FastLED.clear();
+    Spriteopen.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
+  }
 }
 
 // Fill the board with the colors
@@ -248,6 +258,10 @@ int Board::getCursorX() {
 
 int Board::getCursorY() {
   return cursorY;
+}
+
+void Board::resetEnemyColors() {
+  enemyColors.clear();
 }
 
 void Board::resetColors() {

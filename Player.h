@@ -33,7 +33,10 @@ class Player {
     void setCursor(char id, int x, int y, int length, int orientation);
     int getCursorX();
     int getCursorY();
+    void resetEnemyColors();
     void resetColors();
     Joystick joystick;
     ezButton button;
+
+    void printScroller();
 };

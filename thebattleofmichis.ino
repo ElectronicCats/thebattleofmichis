@@ -76,7 +76,8 @@ void setup() {
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(OnDataRecv);
 
-  // setupShips();
+  startup();
+  setupShips();
 }
 
 void loop() {
@@ -117,6 +118,20 @@ void loop() {
     // Send message via ESP-NOW
     esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
     // player.resetColors();
+  }
+}
+
+void startup() {
+  for(;;) {
+    player.loop();
+    player.printScroller();
+
+    // Once is pressed, the program continues with the setup of the ships
+    if (player.button.isPressed()) {
+      player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
+      player.printBoard();
+      break;
+    }
   }
 }
 
