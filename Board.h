@@ -46,6 +46,7 @@ class Board {
     void setCursor(char id, int x, int y, int length, int orientation);
     int getCursorX();
     int getCursorY();
+    void resetEnemyColors();
     void resetColors();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
