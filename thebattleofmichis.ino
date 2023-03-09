@@ -79,6 +79,7 @@ void setup() {
   esp_now_register_recv_cb(OnDataRecv);
 
   startup();
+  chooseFirstPlayer();
   setupShips();
 }
 
@@ -162,6 +163,54 @@ void startup() {
       player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
       player.printBoard();
       break;
+    }
+
+    // The other player wants to give the turn
+    if (incoming_request) {
+      printIncomingData();
+      incoming_request = false;
+      delay(2000);
+    }
+  }
+}
+
+void chooseFirstPlayer() {
+  Serial.println("Choosing firs player");
+  for(;;) {
+    static unsigned long lastTime = millis();
+    player.loop();
+    
+    if (millis() - lastTime >= 1000) {
+      lastTime = millis();
+      Serial.println("Has turn: " + String(hasTurn));
+      Serial.println("Connection succesful: " + String(success));
+    }
+
+    // Give turn to the other player
+    if (player.button.isPressed()) {
+      outgoing.x = 1;
+      outgoing.y = 1;
+      outgoing.request = true;
+      outgoing.response = false;
+      outgoing.isHit = false;
+      outgoing.hasTurn = true;
+
+      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+    }
+
+    if (incoming_request) {
+      incoming_request = false;
+      delay(2000);
+
+      outgoing.x = incoming_x;
+      outgoing.y = incoming_y;
+      outgoing.request = false;
+      outgoing.response = true;
+      outgoing.isHit = false;
+      outgoing.hasTurn = false;
+      success = true;
+      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+      Serial.println("Sent response");
     }
   }
 }
