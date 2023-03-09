@@ -105,7 +105,7 @@ void Board::print() {
 void Board::initMainBoard() {
   FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
   FastLED.setBrightness(BRIGHTNESS);
-  FastLED.clear(true);
+  // FastLED.clear(true);
   MainSprites.AddSprite(&MainSpriteBoard);
 }
 
@@ -196,7 +196,7 @@ void Board::placeShip(Ship ship) {
   }
 }
 
-void Board::setCursor(char id, int x, int y, int length, int orientation) {
+void Board::setCursor(char id, int x, int y, int length, int orientation, int color) {
   static int x_t = x;
   static int y_t = y;
   static int orientation_t = orientation;
@@ -244,12 +244,20 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
 
   // Display the cursor
   if (orientation_t == Horizontal) {
-    Board::setHorizontalLine(id, x_t, y_t, length, Red);
+    Board::setHorizontalLine(id, x_t, y_t, length, color);
   } else if (orientation_t == Vertical) {
-    Board::setVerticalLine(id, x_t, y_t, length, Red);
+    Board::setVerticalLine(id, x_t, y_t, length, color);
   }
 
   Board::print();
+}
+
+void Board::clear(char id) {
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      Board::setPixel(id, i + 1, j + 1, Blue);
+    }
+  }
 }
 
 int Board::getCursorX() {
@@ -264,7 +272,7 @@ void Board::resetEnemyColors() {
   enemyColors.clear();
 }
 
-void Board::resetColors() {
+void Board::resetMainColors() {
   mainColors.clear();
 }
 
