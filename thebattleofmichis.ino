@@ -1,9 +1,9 @@
-#define DEBUG
-
 #include "Player.h"
 #include <esp_now.h>
 #include <esp_wifi.h>
 #include <WiFi.h>
+
+#define DEBUG
 
 Player player;
 int Vertical = Board::Vertical, Horizontal = Board::Horizontal;
@@ -11,18 +11,13 @@ int Vertical = Board::Vertical, Horizontal = Board::Horizontal;
 // The boards can stablish communication if they have the same MAC address
 uint8_t newMacAddress[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
 
-// Define variables to be sent
-uint8_t x;
-uint8_t y;
-uint8_t color;
-
 // Define variables to store incoming data
 uint8_t incoming_x;
 uint8_t incoming_y;
 bool incoming_request = false;
 bool incoming_response = false;
 bool incoming_isHit = false;
-bool hasTurn = true;
+bool hasTurn = false;
 
 typedef struct message {
     bool request;
@@ -96,8 +91,25 @@ void sendHits() {
     static unsigned long lastTime = millis();
     player.loop();
 
-    // The player has losed the game
-    if (player.getSunkenShips() == 3) {
+    // The player has lost the game
+    if (player.getSunkenShips() == 5) {
+      #ifdef DEBUG
+        Serial.println("You lose");
+      #endif
+
+      incoming_request = false;
+      incoming_response = false;
+      incoming_isHit = false;
+      hasTurn = true;
+      success = false;
+      
+      outgoing.x = 1;
+      outgoing.y = 1;
+      outgoing.request = false;
+      outgoing.response = false;
+      outgoing.isHit = false;
+      outgoing.hasTurn = false;
+
       break;
     }
 
@@ -240,9 +252,9 @@ void setupShips() {
   printIncomingData();
   placeShip(2); // Destroyer
   placeShip(3); // Submarine
-  placeShip(3); // Cruiser
-  placeShip(4); // Battleship
-  placeShip(5); // Aircraft Carrier
+  // placeShip(3); // Cruiser
+  // placeShip(4); // Battleship
+  // placeShip(5); // Aircraft Carrier
 }
 
 void placeShip(int length) {
@@ -283,12 +295,15 @@ void placeShip(int length) {
 }
 
 void endGame() {
+  #ifdef DEBUG
+    Serial.println("END GAME");
+  #endif
   for(;;) {
     player.loop();
     player.printScroller(4);
 
     // Once is pressed, the program continues with the setup of the ships
-    if (player.button.isPressed() || success) {
+    if (player.button.isPressed()) {
       FastLED.clear();
       player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
       player.printBoard();
