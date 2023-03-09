@@ -155,7 +155,7 @@ void loop() {
 void startup() {
   for(;;) {
     player.loop();
-    player.printScroller();
+    player.printScroller(1);
 
     // Once is pressed, the program continues with the setup of the ships
     if (player.button.isPressed()) {
