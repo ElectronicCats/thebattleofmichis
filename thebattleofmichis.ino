@@ -17,16 +17,18 @@ uint8_t color;
 // Define variables to store incoming data
 uint8_t incoming_x;
 uint8_t incoming_y;
-bool incoming_status = false;
+bool incoming_request = false;
 bool incoming_response = false;
 bool incoming_isHit = false;
+bool hasTurn = false;
 
 typedef struct message {
-    bool status;
+    bool request;
     bool response;
     uint8_t x;
     uint8_t y;
     bool isHit;
+    bool hasTurn;
 } message;
 
 // Create a message called outgoing
@@ -60,7 +62,7 @@ void setup() {
   }
 
   // Once ESPNow is successfully Init, we will register for Send CB to
-  // get the status of Trasnmitted packet
+  // get the request of Trasnmitted packet
   esp_now_register_send_cb(OnDataSent);
   
   // Register peer
@@ -81,22 +83,52 @@ void setup() {
 }
 
 void loop() {
-  player.loop();
-  player.setCursor('e', 4, 4, 1, Horizontal);
+  const int center = 4;
+  const int cursorLength = 1;
   static unsigned long lastTime = millis();
+  player.loop();
+
+  if (millis() - lastTime >= 1000) {
+    lastTime = millis();
+    Serial.println("Has turn: " + String(hasTurn));
+  }
+
+  if (hasTurn) {
+    player.setCursor('e', center, center, cursorLength, Horizontal, Board::Red);
+  } else {
+    // TODO: remove the cursor
+    player.setCursor('e', center, center, cursorLength, Horizontal, Board::Blue);
+  }
+
+  // Send a hit to the other player
+  if (player.button.isPressed() && hasTurn) {
+    hasTurn = false;
+
+    outgoing.x = player.getCursorX();
+    outgoing.y = player.getCursorY();
+    outgoing.request = true;
+    outgoing.response = false;
+    outgoing.isHit = false;
+    outgoing.hasTurn = true; // Give turn to the other player
+
+    // Send message via ESP-NOW
+    esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+    // player.resetMainColors();
+  }
 
   // Hit recieved
-  if (incoming_status) {
-    Serial.println("INCOMING");
+  if (incoming_request) {
     printIncomingData();
-    incoming_status = false;
-
+    incoming_request = false;
     delay(2000);
-    outgoing.x = 0;
-    outgoing.y = 0;
-    outgoing.status = false;
+
+    // Return the coordinates of the hit and if it was a hit
+    outgoing.x = incoming_x;
+    outgoing.y = incoming_y;
+    outgoing.request = false;
     outgoing.response = true;
     outgoing.isHit = player.hit(incoming_x, incoming_y);
+    outgoing.hasTurn = false;
     esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
     Serial.println("Sent response");
   }
@@ -108,25 +140,15 @@ void loop() {
     Serial.println("Is hit: " + String(incoming_isHit));
     Serial.println("Hit on x: " + String(incoming_x) + ", y: " + String(incoming_y));
     // Set the hit
-    if (incoming_isHit == 1) {
+    if (incoming_isHit) {
+      Serial.println("Set red");
       player.setColor('e', incoming_x, incoming_y, Board::Red);
     } else {
+      Serial.println("Set white");
       player.setColor('e', incoming_x, incoming_y, Board::White);
     }
     player.resetMainColors();
     player.resetEnemyColors();
-  }
-
-  if (player.button.isPressed()) {
-    outgoing.x = player.getCursorX();
-    outgoing.y = player.getCursorY();
-    outgoing.status = true;
-    outgoing.response = false;
-    outgoing.isHit = false;
-
-    // Send message via ESP-NOW
-    esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-    // player.resetMainColors();
   }
 }
 
@@ -159,7 +181,7 @@ void placeShip(int length) {
 
   for (;;) {
     player.loop();
-    player.setCursor('m', center, center, length, orientation);
+    player.setCursor('m', center, center, length, orientation, Board::Red);
 
     // Toggle orientation
     if (player.joystick.button.isPressed()) {
@@ -201,17 +223,18 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.println(len);
   incoming_x = incoming.x;
   incoming_y = incoming.y;
-  incoming_status = incoming.status;
+  incoming_request = incoming.request;
   incoming_response = incoming.response;
   incoming_isHit = incoming.isHit;
-  Serial.println("Incoming status: " + String(incoming_status));
+  hasTurn = incoming.hasTurn;
+  Serial.println("Incoming request: " + String(incoming_request));
   Serial.println("Incoming response: " + String(incoming_response));
 }
 
 void printIncomingData(){
   Serial.println("x: " + String(incoming_x));
   Serial.println("y: " + String(incoming_y));
-  Serial.println("hit: " + String(incoming_status));
+  Serial.println("hit: " + String(incoming_request));
   Serial.println("response: " + String(incoming_response));
   Serial.println("isHit: " + String(incoming_isHit));
 }
