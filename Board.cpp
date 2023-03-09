@@ -322,14 +322,6 @@ void Board::clear(char id) {
   }
 }
 
-void Board::clear(char id) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      Board::setPixel(id, i + 1, j + 1, Blue);
-    }
-  }
-}
-
 int Board::getCursorX() {
   return cursorX;
 }

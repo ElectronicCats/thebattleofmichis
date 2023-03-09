@@ -6,7 +6,7 @@
 #include <LEDMatrix.h>    // https://github.com/AaronLiddiment/LEDMatrix.git
 #include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
 
-#define CUSTOM_BOARD      true // true -> Electronic Cats board, false -> CJMCU-64 board
+#define CUSTOM_BOARD      false // true -> Electronic Cats board, false -> CJMCU-64 board
 #define PIN_MATRIX_1      16
 #define PIN_MATRIX_2      17
 #define COLOR_ORDER       GRB // GRB ordering is typical for the WS2812B chipset
