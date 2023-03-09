@@ -87,13 +87,13 @@ void loop() {
 
   // Hit recieved
   if (incoming_status) {
-    Serial.println("INCOMING");
     printIncomingData();
     incoming_status = false;
-
     delay(2000);
-    outgoing.x = 0;
-    outgoing.y = 0;
+
+    // Return the coordinates of the hit and if it was a hit
+    outgoing.x = incoming_x;
+    outgoing.y = incoming_y;
     outgoing.status = false;
     outgoing.response = true;
     outgoing.isHit = player.hit(incoming_x, incoming_y);
@@ -106,6 +106,17 @@ void loop() {
     incoming_response = false;
     Serial.println("\nFrom response");
     Serial.println("Is hit: " + String(incoming_isHit));
+    Serial.println("Hit on x: " + String(incoming_x) + ", y: " + String(incoming_y));
+    // Set the hit
+    if (incoming_isHit) {
+      Serial.println("Set red");
+      player.setColor('e', incoming_x, incoming_y, Board::Red);
+    } else {
+      Serial.println("Set white");
+      player.setColor('e', incoming_x, incoming_y, Board::White);
+    }
+    player.resetMainColors();
+    player.resetEnemyColors();
   }
 
   if (player.button.isPressed()) {
@@ -117,7 +128,7 @@ void loop() {
 
     // Send message via ESP-NOW
     esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-    // player.resetColors();
+    // player.resetMainColors();
   }
 }
 
@@ -137,10 +148,10 @@ void startup() {
 
 void setupShips() {
   placeShip(2); // Destroyer
-  placeShip(3); // Submarine
-  placeShip(3); // Cruiser
-  placeShip(4); // Battleship
-  placeShip(5); // Aircraft Carrier
+  // placeShip(3); // Submarine
+  // placeShip(3); // Cruiser
+  // placeShip(4); // Battleship
+  // placeShip(5); // Aircraft Carrier
 }
 
 void placeShip(int length) {
@@ -173,7 +184,7 @@ void placeShip(int length) {
       if (player.createShip(startX, startY, endX, endY)) {
         player.placeShip(player.getShip(player.getShipsList().size() - 1));
         player.printBoard();
-        player.resetColors();
+        player.resetMainColors();
         break;
       }
     }
@@ -192,9 +203,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.println(len);
   incoming_x = incoming.x;
   incoming_y = incoming.y;
-  incoming_status = !incoming.status;
-  incoming_response = !incoming.response;
-  incoming_isHit = !incoming.isHit;
+  incoming_status = incoming.status;
+  incoming_response = incoming.response;
+  incoming_isHit = incoming.isHit;
   Serial.println("Incoming status: " + String(incoming_status));
   Serial.println("Incoming response: " + String(incoming_response));
 }

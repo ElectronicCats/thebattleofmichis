@@ -47,7 +47,7 @@ class Board {
     int getCursorX();
     int getCursorY();
     void resetEnemyColors();
-    void resetColors();
+    void resetMainColors();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
     void setHorizontalLine(char id, int x, int y, int length, int color);
