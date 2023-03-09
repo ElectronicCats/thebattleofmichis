@@ -40,5 +40,5 @@ class Player {
     Joystick joystick;
     ezButton button;
 
-    void printScroller();
+    void printScroller(int id);
 };
