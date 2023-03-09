@@ -38,7 +38,7 @@ bool Player::hit(int x, int y) {
       isHit = true;
     } else {
       if (this->board.getPixel('m', x, y) != Board::Green) {
-        this->board.setPixel('e', x, y, 2);
+        // this->board.setPixel('e', x, y, 2);
       }
     }
   }

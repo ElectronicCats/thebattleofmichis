@@ -79,8 +79,9 @@ void setup() {
   esp_now_register_recv_cb(OnDataRecv);
 
   startup();
-  chooseFirstPlayer();
   setupShips();
+  chooseFirstPlayer();
+  Serial.println("MAIN LOOP");
 }
 
 void loop() {
@@ -159,26 +160,20 @@ void startup() {
     player.printScroller();
 
     // Once is pressed, the program continues with the setup of the ships
-    if (player.button.isPressed()) {
+    if (player.button.isPressed() || success) {
+      FastLED.clear();
       player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
       player.printBoard();
       break;
-    }
-
-    // The other player wants to give the turn
-    if (incoming_request) {
-      printIncomingData();
-      incoming_request = false;
-      delay(2000);
     }
   }
 }
 
 void chooseFirstPlayer() {
-  Serial.println("Choosing firs player");
+  Serial.println("CHOOSING THE FIRST PLAYER");
   for(;;) {
     static unsigned long lastTime = millis();
-    player.loop();
+    static unsigned long lastTime2 = millis();
     
     if (millis() - lastTime >= 1000) {
       lastTime = millis();
@@ -186,10 +181,13 @@ void chooseFirstPlayer() {
       Serial.println("Connection succesful: " + String(success));
     }
 
-    // Give turn to the other player
-    if (player.button.isPressed()) {
-      outgoing.x = 1;
-      outgoing.y = 1;
+    // Send a request giving the turn to the other player
+    if (millis() - lastTime2 >= 3000 && !hasTurn) {
+      lastTime2 = millis();
+      Serial.println("Sending the turn");
+
+      outgoing.x = 0;
+      outgoing.y = 0;
       outgoing.request = true;
       outgoing.response = false;
       outgoing.isHit = false;
@@ -212,10 +210,19 @@ void chooseFirstPlayer() {
       esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
       Serial.println("Sent response");
     }
+
+    if (incoming_response || hasTurn) {
+      Serial.println("OUT OF CHOOSE FIRST PLAYER");
+      incoming_response = false;
+      success = false;
+      break;
+    }
   }
 }
 
 void setupShips() {
+  Serial.println("PLACING SHIPS");
+  printIncomingData();
   placeShip(2); // Destroyer
   // placeShip(3); // Submarine
   // placeShip(3); // Cruiser
@@ -276,14 +283,17 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   incoming_response = incoming.response;
   incoming_isHit = incoming.isHit;
   hasTurn = incoming.hasTurn;
-  Serial.println("Incoming request: " + String(incoming_request));
-  Serial.println("Incoming response: " + String(incoming_response));
+  success = true;
+  // Serial.println("Incoming request: " + String(incoming_request));
+  // Serial.println("Incoming response: " + String(incoming_response));
 }
 
 void printIncomingData(){
   Serial.println("x: " + String(incoming_x));
   Serial.println("y: " + String(incoming_y));
-  Serial.println("hit: " + String(incoming_request));
+  Serial.println("request: " + String(incoming_request));
   Serial.println("response: " + String(incoming_response));
   Serial.println("isHit: " + String(incoming_isHit));
+  Serial.println("hasTurn: " + String(hasTurn));
+  Serial.println("success: " + String(success));
 }
