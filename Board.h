@@ -43,13 +43,14 @@ class Board {
     void illuminate(char id, int **matrix);
     void scroller();
     void placeShip(Ship ship);
-    void setCursor(char id, int x, int y, int length, int orientation);
+    void setCursor(char id, int x, int y, int length, int orientation, int color);
     int getCursorX();
     int getCursorY();
     void resetEnemyColors();
     void resetMainColors();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
+    void clear(char id);
     void setHorizontalLine(char id, int x, int y, int length, int color);
     void setVerticalLine(char id, int x, int y, int length, int color);
 };

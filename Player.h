@@ -30,10 +30,11 @@ class Player {
     Ship getShip(int arrayPosition);
     std::vector<Ship> getShipsList();
 
-    void setCursor(char id, int x, int y, int length, int orientation);
+    void setCursor(char id, int x, int y, int length, int orientation, int color);
     int getCursorX();
     int getCursorY();
     void setColor(char id, int x, int y, int color);
+    void clearBoard(char id);
     void resetEnemyColors();
     void resetMainColors();
     Joystick joystick;
