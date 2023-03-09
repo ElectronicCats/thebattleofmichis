@@ -34,11 +34,11 @@ bool Player::hit(int x, int y) {
   for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
       Player::isShipSunken(ship);
-      this->board.setPixel('e', x, y, 3);
+      this->board.setPixel('m', x, y, Board::Red);
       isHit = true;
     } else {
       if (this->board.getPixel('m', x, y) != Board::Green) {
-        this->board.setPixel('e', x, y, 2);
+        // this->board.setPixel('e', x, y, 2);
       }
     }
   }
@@ -134,6 +134,10 @@ int Player::getCursorX() {
   return this->board.getCursorX();
 }
 
+void Player::setColor(char id, int x, int y, int color) {
+  this->board.setPixel(id, x, y, color);
+}
+
 int Player::getCursorY() {
   return this->board.getCursorY();
 }
@@ -142,8 +146,8 @@ void Player::resetEnemyColors() {
   this->board.resetEnemyColors();
 }
 
-void Player::resetColors() {
-  this->board.resetColors();
+void Player::resetMainColors() {
+  this->board.resetMainColors();
 }
 
 void Player::printScroller() {

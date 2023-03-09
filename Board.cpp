@@ -264,7 +264,7 @@ void Board::resetEnemyColors() {
   enemyColors.clear();
 }
 
-void Board::resetColors() {
+void Board::resetMainColors() {
   mainColors.clear();
 }
 
