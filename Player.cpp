@@ -4,7 +4,6 @@ Player::Player() : board(ROWS, COLS), button(BUTTON_PIN) {
   sunkenShips = 0;
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   this->button.setDebounceTime(DEBOUNCE_DELAY);
-  
 }
 
 void Player::loop() {
@@ -35,11 +34,11 @@ bool Player::hit(int x, int y) {
   for (auto &ship : ships) {
     if (ship.isHit(x, y)) {
       Player::isShipSunken(ship);
-      this->board.setPixel('e', x, y, 3);
+      this->board.setPixel('m', x, y, Board::Red);
       isHit = true;
     } else {
       if (this->board.getPixel('m', x, y) != Board::Green) {
-        this->board.setPixel('e', x, y, 2);
+        this->board.setPixel('e', x, y, Board::Blue);
       }
     }
   }
@@ -103,7 +102,7 @@ std::vector<Ship> Player::getShipsList() {
   return ships;
 }
 
-void Player::setCursor(char id, int x, int y, int length, int orientation) {
+void Player::setCursor(char id, int x, int y, int length, int orientation, int color) {
   static int x_t = x;
   static int y_t = y;
   static unsigned long lastTime = 0;
@@ -126,15 +125,23 @@ void Player::setCursor(char id, int x, int y, int length, int orientation) {
         if (y_t < 8) y_t++;
         break;
       case 4:
-        break;        
+        break;  
     }
     // Update the cursor position
-    this->board.setCursor(id, x_t, y_t, length, orientation);
+    this->board.setCursor(id, x_t, y_t, length, orientation, color);
   }
 }
 
 int Player::getCursorX() {
   return this->board.getCursorX();
+}
+
+void Player::setColor(char id, int x, int y, int color) {
+  this->board.setPixel(id, x, y, color);
+}
+
+void Player::clearBoard(char id) {
+  this->board.clear(id);
 }
 
 int Player::getCursorY() {
@@ -145,8 +152,8 @@ void Player::resetEnemyColors() {
   this->board.resetEnemyColors();
 }
 
-void Player::resetColors() {
-  this->board.resetColors();
+void Player::resetMainColors() {
+  this->board.resetMainColors();
 }
 
 void Player::printScroller(int id) {

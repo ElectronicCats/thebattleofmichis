@@ -12,7 +12,7 @@
 #define COLOR_ORDER       GRB // GRB ordering is typical for the WS2812B chipset
 #define CHIPSET           WS2812B
 
-#define BRIGHTNESS        8
+#define BRIGHTNESS        3
 #define CURSOR_DELAY_TIME 200 // Miliseconds
 
 #define SHAPE_WIDTH       8
@@ -43,13 +43,14 @@ class Board {
     void illuminate(char id, int **matrix);
     void scroller(int id);
     void placeShip(Ship ship);
-    void setCursor(char id, int x, int y, int length, int orientation);
+    void setCursor(char id, int x, int y, int length, int orientation, int color);
     int getCursorX();
     int getCursorY();
     void resetEnemyColors();
-    void resetColors();
+    void resetMainColors();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
+    void clear(char id);
     void setHorizontalLine(char id, int x, int y, int length, int color);
     void setVerticalLine(char id, int x, int y, int length, int color);
 };

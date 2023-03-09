@@ -68,7 +68,6 @@ const uint8_t SpritesetupData[] = {
 const struct CRGB SpritesetupCols[7] = { CRGB(255,255,255), CRGB(254,255,0), CRGB(0,169,255), CRGB(170,170,170), CRGB(85,85,85), CRGB(0,0,0), CRGB(0,0,0) };
 cSprite Spritesetup(160, 8, SpritesetupData, 1, _3BIT, SpritesetupCols);
 
-
 cLEDSprites MainSprites(&mainBoardUp);
 cLEDSprites EnemySprites(&enemyBoardUp);
 
@@ -147,6 +146,21 @@ void Board::print(int state) {
   
   Board::illuminate('m', main);
   Board::illuminate('e', enemy);
+}
+
+void Board::initMainBoard() {
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
+  FastLED.setBrightness(BRIGHTNESS);
+  // FastLED.clear(true);
+  MainSprites.AddSprite(&MainSpriteBoard);
+}
+
+void Board::initEnemyBoard() {
+  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(enemyBoardUp[0], enemyBoardUp.Size());
+  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.clear(true);
+  EnemySprites.AddSprite(&EnemySpriteBoard);
+  EnemySprites.AddSprite(&Spriteopen);
 }
 
 // LED banner test
@@ -244,7 +258,7 @@ void Board::placeShip(Ship ship) {
   }
 }
 
-void Board::setCursor(char id, int x, int y, int length, int orientation) {
+void Board::setCursor(char id, int x, int y, int length, int orientation, int color) {
   static int x_t = x;
   static int y_t = y;
   static int orientation_t = orientation;
@@ -292,12 +306,20 @@ void Board::setCursor(char id, int x, int y, int length, int orientation) {
 
   // Display the cursor
   if (orientation_t == Horizontal) {
-    Board::setHorizontalLine(id, x_t, y_t, length, Red);
+    Board::setHorizontalLine(id, x_t, y_t, length, color);
   } else if (orientation_t == Vertical) {
-    Board::setVerticalLine(id, x_t, y_t, length, Red);
+    Board::setVerticalLine(id, x_t, y_t, length, color);
   }
 
   Board::print(1);
+}
+
+void Board::clear(char id) {
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      Board::setPixel(id, i + 1, j + 1, Blue);
+    }
+  }
 }
 
 int Board::getCursorX() {
@@ -312,7 +334,7 @@ void Board::resetEnemyColors() {
   enemyColors.clear();
 }
 
-void Board::resetColors() {
+void Board::resetMainColors() {
   mainColors.clear();
 }
 
