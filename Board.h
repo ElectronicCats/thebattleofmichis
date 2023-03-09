@@ -6,13 +6,13 @@
 #include <LEDMatrix.h>    // https://github.com/AaronLiddiment/LEDMatrix.git
 #include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
 
-#define CUSTOM_BOARD      false // true -> Electronic Cats board, false -> CJMCU-64 board
+#define CUSTOM_BOARD      true // true -> Electronic Cats board, false -> CJMCU-64 board
 #define PIN_MATRIX_1      16
 #define PIN_MATRIX_2      17
 #define COLOR_ORDER       GRB // GRB ordering is typical for the WS2812B chipset
 #define CHIPSET           WS2812B
 
-#define BRIGHTNESS        3
+#define BRIGHTNESS        8
 #define CURSOR_DELAY_TIME 200 // Miliseconds
 
 #define SHAPE_WIDTH       8
@@ -39,9 +39,9 @@ class Board {
     Board(int rows, int cols);
     enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
     enum Orientation { Horizontal = 0, Vertical = 1 };
-    void print();
+    void print(int state);
     void illuminate(char id, int **matrix);
-    void scroller();
+    void scroller(int id);
     void placeShip(Ship ship);
     void setCursor(char id, int x, int y, int length, int orientation);
     int getCursorX();

@@ -4,6 +4,7 @@ Player::Player() : board(ROWS, COLS), button(BUTTON_PIN) {
   sunkenShips = 0;
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   this->button.setDebounceTime(DEBOUNCE_DELAY);
+  
 }
 
 void Player::loop() {
@@ -12,7 +13,7 @@ void Player::loop() {
 }
 
 void Player::printBoard() {
-  board.print();
+  board.print(1);
 }
 
 /**
@@ -124,6 +125,8 @@ void Player::setCursor(char id, int x, int y, int length, int orientation) {
       case 3:
         if (y_t < 8) y_t++;
         break;
+      case 4:
+        break;        
     }
     // Update the cursor position
     this->board.setCursor(id, x_t, y_t, length, orientation);
@@ -146,6 +149,6 @@ void Player::resetColors() {
   this->board.resetColors();
 }
 
-void Player::printScroller() {
-  this->board.scroller();
+void Player::printScroller(int id) {
+  this->board.scroller(id);
 }
