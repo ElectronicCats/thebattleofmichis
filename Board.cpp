@@ -105,7 +105,7 @@ void Board::print() {
 void Board::initMainBoard() {
   FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
   FastLED.setBrightness(BRIGHTNESS);
-  FastLED.clear(true);
+  // FastLED.clear(true);
   MainSprites.AddSprite(&MainSpriteBoard);
 }
 

@@ -81,9 +81,24 @@ void setup() {
 }
 
 void loop() {
-  player.loop();
-  player.setCursor('e', 4, 4, 1, Horizontal);
+  const int center = 4;
+  const int cursorLength = 1;
   static unsigned long lastTime = millis();
+  player.loop();
+  player.setCursor('e', center, center, cursorLength, Horizontal);
+
+  // Send a hit to the other player
+  if (player.button.isPressed()) {
+    outgoing.x = player.getCursorX();
+    outgoing.y = player.getCursorY();
+    outgoing.status = true;
+    outgoing.response = false;
+    outgoing.isHit = false;
+
+    // Send message via ESP-NOW
+    esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+    // player.resetMainColors();
+  }
 
   // Hit recieved
   if (incoming_status) {
@@ -117,18 +132,6 @@ void loop() {
     }
     player.resetMainColors();
     player.resetEnemyColors();
-  }
-
-  if (player.button.isPressed()) {
-    outgoing.x = player.getCursorX();
-    outgoing.y = player.getCursorY();
-    outgoing.status = true;
-    outgoing.response = false;
-    outgoing.isHit = false;
-
-    // Send message via ESP-NOW
-    esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-    // player.resetMainColors();
   }
 }
 
