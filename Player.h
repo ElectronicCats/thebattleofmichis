@@ -25,6 +25,7 @@ class Player {
     bool hit(int x, int y);
     bool isShipSunken(Ship ship); // Increase the number of sunken ships
     int getSunkenShips();
+    void setSunkenShips(int sunkenShips);
     bool createShip(int startX, int startY, int endX, int endY);
     bool isValidShipCoordinates(int startX, int startY, int endX, int endY);
     Ship getShip(int arrayPosition);
