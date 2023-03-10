@@ -246,6 +246,7 @@ void Board::setCursor(char id, int x, int y, int length, int orientation, int co
   static int x_t = x;
   static int y_t = y;
   static int orientation_t = orientation;
+  // TODO: init the enemy colors vector
 
   // Validates if the line can be displayed, if not, it will be displayed in the last position
   if (!(x >= 0 && x <= SHAPE_WIDTH - length) && orientation_t == Horizontal) {
@@ -332,6 +333,11 @@ void Board::setPixel(char id, int x, int y, int value) {
   int index = x * cols + y;
   id == 'm' ? main[y - 1][x - 1] = value : enemy[y - 1][x - 1] = value;
   // id == 'm' ? mainColors[index] = value : enemyColors[index] = value;
+}
+
+int Board::getColor(char id, int x, int y) {
+  int index = x * cols + y;
+  return id == 'm' ? mainColors[index] : enemyColors[index];
 }
 
 void Board::setHorizontalLine(char id, int x, int y, int length, int color) {
