@@ -63,6 +63,10 @@ int Player::getSunkenShips() {
   return this->sunkenShips;
 }
 
+void Player::setSunkenShips(int sunkenShips) {
+  this->sunkenShips = sunkenShips;
+}
+
 bool Player::createShip(int startX, int startY, int endX, int endY) {
   if (!Player::isValidShipCoordinates(startX, startY, endX, endY)) {
     return false;

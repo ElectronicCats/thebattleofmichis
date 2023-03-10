@@ -135,7 +135,6 @@ void Board::print(int state) {
 
   FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
   FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(enemyBoardUp[0], enemyBoardUp.Size());
-
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear();
   
@@ -146,21 +145,6 @@ void Board::print(int state) {
   
   Board::illuminate('m', main);
   Board::illuminate('e', enemy);
-}
-
-void Board::initMainBoard() {
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
-  FastLED.setBrightness(BRIGHTNESS);
-  // FastLED.clear(true);
-  MainSprites.AddSprite(&MainSpriteBoard);
-}
-
-void Board::initEnemyBoard() {
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(enemyBoardUp[0], enemyBoardUp.Size());
-  FastLED.setBrightness(BRIGHTNESS);
-  FastLED.clear(true);
-  EnemySprites.AddSprite(&EnemySpriteBoard);
-  EnemySprites.AddSprite(&Spriteopen);
 }
 
 // LED banner test
@@ -320,6 +304,7 @@ void Board::clear(char id) {
       Board::setPixel(id, i + 1, j + 1, Blue);
     }
   }
+  id == 'm' ? mainColors.clear() : enemyColors.clear();
 }
 
 int Board::getCursorX() {
