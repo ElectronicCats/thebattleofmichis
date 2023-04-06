@@ -153,7 +153,7 @@ void Board::scroller(int id) {
   static unsigned long lastTime = millis();
 
   if (millis() - lastTime > 100) {
-    Serial.println("Counter: " + String(counter));
+    // Serial.println("Counter: " + String(counter));
     lastTime = millis();
     counter++;
  
