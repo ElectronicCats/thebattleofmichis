@@ -94,7 +94,7 @@ void sendHits() {
     player.loop();
 
     // The player has lost the game
-    if (player.getSunkenShips() == 5) {
+    if (player.getSunkenShips() == player.getShipsList().size()) {
       #ifdef DEBUG
         Serial.println("You lose");
       #endif
@@ -275,10 +275,10 @@ void setupShips() {
   Serial.println("PLACING SHIPS");
   printIncomingData();
   placeShip(2); // Destroyer
-  placeShip(3); // Submarine
-  placeShip(3); // Cruiser
-  placeShip(4); // Battleship
-  placeShip(5); // Aircraft Carrier
+  // placeShip(3); // Submarine
+  // placeShip(3); // Cruiser
+  // placeShip(4); // Battleship
+  // placeShip(5); // Aircraft Carrier
 }
 
 void placeShip(int length) {
