@@ -160,6 +160,8 @@ void sendHits() {
       esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
     }
 
+    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
+
     // Hit recieved
     if (incoming_request) {
       printIncomingData();
@@ -214,6 +216,9 @@ void startup() {
       player.printBoard();
       break;
     }
+
+    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
+      
   }
 }
 
@@ -292,6 +297,8 @@ void placeShip(int length) {
       orientation = orientation == Vertical ? Horizontal : Vertical;
     }
 
+    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
+
     // Place ship
     if (player.button.isPressed()) {
       if (orientation == Horizontal) {
@@ -327,7 +334,9 @@ void endBanner() {
     } else {
       player.printScroller(Board::Lose);
     }
-
+    
+    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
+    
     // Once is pressed, the game is restarted
     if (player.button.isPressed()) {
       FastLED.clear();
