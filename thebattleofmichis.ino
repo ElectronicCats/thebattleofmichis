@@ -4,6 +4,7 @@
 #include <WiFi.h>
 
 #define DEBUG
+#define RESPONSE_DELAY 50 // miliseconds
 
 Player player;
 int Vertical = Board::Vertical, Horizontal = Board::Horizontal;
@@ -17,7 +18,7 @@ uint8_t incoming_y;
 bool incoming_request = false;
 bool incoming_response = false;
 bool incoming_isHit = false;
-bool hasTurn = true;
+bool hasTurn = false;
 bool winner = false;
 
 typedef struct message {
@@ -87,6 +88,7 @@ void loop() {
 }
 
 void sendHits() {
+  winner = false; // There is no winner when the game starts
   for(;;) {
     const int center = 4;
     const int cursorLength = 1;
@@ -99,15 +101,7 @@ void sendHits() {
         Serial.println("You lose");
       #endif
 
-      player.setSunkenShips(0);
-      incoming_request = false;
-      incoming_response = false;
-      incoming_isHit = false;
-      hasTurn = true;
-      success = false;
-
-      player.clearBoard('e');
-      player.clearBoard('m');
+      resetGameVariables(true);
 
       outgoing.winner = true; // Tells the other player to end the game
       esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
@@ -120,15 +114,14 @@ void sendHits() {
         Serial.println("You win");
       #endif
 
-      player.setSunkenShips(0);
-      player.clearBoard('e');
-      player.clearBoard('m');
+      resetGameVariables(false);
       break;
     }
 
-    if (millis() - lastTime >= 1000) {
+    if (millis() - lastTime >= 3000) {
       lastTime = millis();
       #ifdef DEBUG
+        Serial.println("Number of ships: " + String(player.getShipsList().size()));
         Serial.println("Sunken ships: " + String(player.getSunkenShips()));
         Serial.println("Has turn: " + String(hasTurn));
       #endif
@@ -171,7 +164,7 @@ void sendHits() {
     if (incoming_request) {
       printIncomingData();
       incoming_request = false;
-      delay(2000);
+      delay(RESPONSE_DELAY);
 
       // Return the coordinates of the hit and if it was a hit
       outgoing.x = incoming_x;
@@ -206,6 +199,10 @@ void sendHits() {
 }
 
 void startup() {
+  success = false;
+  #ifdef DEBUG
+    Serial.println("STARTUP");
+  #endif
   for(;;) {
     player.loop();
     player.printScroller(Board::Start);
@@ -322,6 +319,7 @@ void endBanner() {
   #ifdef DEBUG
     Serial.println("END GAME");
   #endif
+  resetBoard();
   for(;;) {
     player.loop();
     if (winner) {
@@ -330,7 +328,7 @@ void endBanner() {
       player.printScroller(Board::Lose);
     }
 
-    // Once is pressed, the program continues with the setup of the ships
+    // Once is pressed, the game is restarted
     if (player.button.isPressed()) {
       FastLED.clear();
       player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
@@ -373,4 +371,25 @@ void printIncomingData() {
     Serial.println("hasTurn: " + String(hasTurn));
     Serial.println("success: " + String(success));
   #endif
+}
+
+void resetGameVariables(bool turn) {
+  player.setSunkenShips(0);
+  incoming_x = 0;
+  incoming_y = 0;
+  incoming_request = false;
+  incoming_response = false;
+  incoming_isHit = false;
+  hasTurn = turn;
+  success = false;
+
+  resetBoard();
+}
+
+void resetBoard() {
+  player.clearBoard('e');
+  player.clearBoard('m');
+  player.resetMainColors();
+  player.resetEnemyColors();
+  player.printBoard();
 }
