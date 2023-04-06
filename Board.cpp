@@ -79,25 +79,17 @@ Board::Board(int rows, int cols) {
   this->cursorX = 0;
   this->cursorY = 0;
 
-  // Fill the main board with 0
+  // Create the main board
   for (int row = 0; row < rows; row++) {
     main[row] = new int[cols];
   }
-  for (int row = 0; row < rows; row++) {
-    for (int col = 0; col < cols; col++) {
-      main[row][col] = 0;
-    }
-  }
 
-  // Fill the enemy board with 0
+  // Create the enemy board
   for (int row = 0; row < rows; row++) {
     enemy[row] = new int[cols];
   }
-  for (int row = 0; row < rows; row++) {
-    for (int col = 0; col < cols; col++) {
-      enemy[row][col] = 0;
-    }
-  }
+
+  Board::clear('m');
 }
 
 // Print the matrix on the serial monitor
@@ -108,7 +100,7 @@ void Board::serialPrint(int **matrix) {
       Serial.print(i);
       Serial.print(" |");
   }
-  Serial.println("\n  -----------------------------------------");
+  Serial.println("\n  --------------------------------------");
 
   for (int row = 0; row < rows; row++) {
     Serial.print((char)('A' + row % 26)); // Increase the letter -> A, B, C, ...
@@ -130,7 +122,11 @@ void Board::serialPrint(int **matrix) {
 
 // Print the matrix on the LED matrix
 void Board::print(int state) {
-  // Board::serialPrint(main);
+  static unsigned long lastTime = millis();
+  if (millis() - lastTime > 3000) {
+    lastTime = millis();
+    Board::serialPrint(main);
+  }
   // Board::serialPrint(enemy);
 
   FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
@@ -306,6 +302,20 @@ void Board::clear(char id) {
     }
   }
   id == 'm' ? mainColors.clear() : enemyColors.clear();
+
+  // Fill the main board with 0
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < cols; col++) {
+      main[row][col] = 0;
+    }
+  }
+
+  // Fill the enemy board with 0
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < cols; col++) {
+      enemy[row][col] = 0;
+    }
+  }
 }
 
 int Board::getCursorX() {
