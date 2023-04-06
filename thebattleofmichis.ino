@@ -251,7 +251,7 @@ void chooseFirstPlayer() {
 
     if (incoming_request) {
       incoming_request = false;
-      delay(2000);
+      delay(RESPONSE_DELAY);
 
       outgoing.x = incoming_x;
       outgoing.y = incoming_y;
@@ -277,10 +277,10 @@ void setupShips() {
   Serial.println("PLACING SHIPS");
   printIncomingData();
   placeShip(2); // Destroyer
-  // placeShip(3); // Submarine
-  // placeShip(3); // Cruiser
-  // placeShip(4); // Battleship
-  // placeShip(5); // Aircraft Carrier
+  placeShip(3); // Submarine
+  placeShip(3); // Cruiser
+  placeShip(4); // Battleship
+  placeShip(5); // Aircraft Carrier
 }
 
 void placeShip(int length) {
