@@ -65,6 +65,10 @@ int Player::getSunkenShips() {
 
 void Player::setSunkenShips(int sunkenShips) {
   this->sunkenShips = sunkenShips;
+
+  if (sunkenShips == 0) {
+    this->ships.clear();
+  }
 }
 
 bool Player::createShip(int startX, int startY, int endX, int endY) {
