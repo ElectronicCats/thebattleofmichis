@@ -6,6 +6,13 @@
 #define DEBUG
 #define RESPONSE_DELAY 50 // miliseconds
 
+// Config variables
+const int SHIP_COLOR = Color::Green;
+const int SHIP_SUNKEN_COLOR = Color::Red;
+const int CURSOR_COLOR = Color::Yellow;
+const int HIT_COLOR = Color::Orange;
+const int OCEAN_COLOR = Color::Blue;                                          
+
 Player player;
 int Vertical = Board::Vertical, Horizontal = Board::Horizontal;
 
@@ -123,12 +130,12 @@ void sendHits() {
       #ifdef DEBUG
         Serial.println("Number of ships: " + String(player.getShipsList().size()));
         Serial.println("Sunken ships: " + String(player.getSunkenShips()));
-        Serial.println("Has turn: " + String(hasTurn));
+        Serial.println("Has turn: " + String(hasTurn ? "true" : "false"));
       #endif
     }
 
     if (hasTurn) {
-      player.setCursor('e', center, center, cursorLength, Horizontal, Board::Red);
+      player.setCursor('e', center, center, cursorLength, Horizontal, CURSOR_COLOR);
     } else {
       player.setCursor('e', center, center, cursorLength, Horizontal, Board::Blue);
     }
