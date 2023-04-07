@@ -125,7 +125,7 @@ void Board::print(int state) {
   static unsigned long lastTime = millis();
   if (millis() - lastTime > 3000) {
     lastTime = millis();
-    Board::serialPrint(main);
+    // Board::serialPrint(main);
   }
   // Board::serialPrint(enemy);
 
@@ -189,30 +189,42 @@ void Board::scroller(int id) {
 void Board::illuminate(char id, int **matrix) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      int value = matrix[i][j];
-      if (value == 0) {
+      int color = matrix[i][j];
+      if (color == Color::Blue) {
         if (id == 'm') {
           MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
         } else if (id == 'e') {
           EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
         }
-      } else if (value == 1) {
+      } else if (color == Color::Green) {
         if (id == 'm') {
           MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
         } else if (id == 'e') {
           EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
         }
-      } else if (value == 2) {
+      } else if (color == Color::White) {
         if (id == 'm') {
           MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
         } else if (id == 'e') {
           EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
         }
-      } else if (value == 3) {
+      } else if (color == Color::Red) {
         if (id == 'm') {
           MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
         } else if (id == 'e') {
           EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
+        }
+      } else if (color == Color::Yellow) {
+        if (id == 'm') {
+          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Yellow;
+        } else if (id == 'e') {
+          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Yellow;
+        }
+      } else if (color == Color::Orange) {
+        if (id == 'm') {
+          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Orange;
+        } else if (id == 'e') {
+          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Orange;
         }
       }
     }
@@ -233,7 +245,7 @@ void Board::illuminate(char id, int **matrix) {
 void Board::placeShip(Ship ship) {
   for (int row = ship.getStartY(); row <= ship.getEndY(); row++) {
     for (int col = ship.getStartX(); col <= ship.getEndX(); col++) {
-      main[row][col] = Green;
+      main[row][col] = Color::Green;
     }
   }
 }
@@ -298,7 +310,7 @@ void Board::setCursor(char id, int x, int y, int length, int orientation, int co
 void Board::clear(char id) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      Board::setPixel(id, i + 1, j + 1, Blue);
+      Board::setPixel(id, i + 1, j + 1, Color::Blue);
     }
   }
   id == 'm' ? mainColors.clear() : enemyColors.clear();
@@ -339,10 +351,10 @@ int Board::getPixel(char id, int x, int y) {
   return id == 'm' ? main[y - 1][x - 1] : enemy[y - 1][x - 1];
 }
 
-void Board::setPixel(char id, int x, int y, int value) {
+void Board::setPixel(char id, int x, int y, int color) {
   int index = x * cols + y;
-  id == 'm' ? main[y - 1][x - 1] = value : enemy[y - 1][x - 1] = value;
-  // id == 'm' ? mainColors[index] = value : enemyColors[index] = value;
+  id == 'm' ? main[y - 1][x - 1] = color : enemy[y - 1][x - 1] = color;
+  // id == 'm' ? mainColors[index] = color : enemyColors[index] = color;
 }
 
 int Board::getColor(char id, int x, int y) {

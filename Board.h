@@ -2,6 +2,7 @@
 #include "Ship.h"
 #include <FastLED.h>
 #include <vector>
+#include "Color.h"
 
 #include <LEDMatrix.h>    // https://github.com/AaronLiddiment/LEDMatrix.git
 #include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
@@ -35,7 +36,7 @@ class Board {
     int **main;
     int **enemy;
     Board(int rows, int cols);
-    enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
+    enum OldColor { Blue = 0, Green = 1, White = 2, Red = 3 };
     enum Orientation { Horizontal = 0, Vertical = 1 };
     enum State { Start = 1, Setup = 2, Win = 3, Lose = 4 };
     void print(int state);
