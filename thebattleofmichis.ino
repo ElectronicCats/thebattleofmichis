@@ -4,9 +4,18 @@
 #include <WiFi.h>
 
 #define DEBUG
+#define RESPONSE_DELAY 50 // miliseconds
 
-Player player1;
-Player player2;
+// Config variables
+const int SHIP_COLOR = Color::Green;
+const int SHIP_SUNKEN_COLOR = Color::Red;
+const int CURSOR_COLOR = Color::Yellow;
+const int HIT_COLOR = Color::Orange;
+const int OCEAN_COLOR = Color::Blue;
+const int BOARD_CENTER = 4;
+const int CURSOR_LENGTH = 1; // 1x1
+
+Player player;
 int Vertical = Board::Vertical, Horizontal = Board::Horizontal;
 
 // The boards can stablish communication if they have the same MAC address
@@ -41,6 +50,16 @@ esp_now_peer_info_t peerInfo;
 
 // Variable to store if sending data was successful
 bool success;
+
+void startup();
+void endBanner();
+void chooseFirstPlayer();
+void sendHits();
+void setupShips();
+void placeShip(int length);
+bool isWinnerOrLoser();
+void printDebugInfo();
+void printCursor();
 
 void setup() {
   Serial.begin(115200);
@@ -87,131 +106,51 @@ void loop() {
   endBanner(); // Shows a banner with "You lose" or "You win"
 }
 
-void sendHits() {
+void startup() {
+  success = false;
+  #ifdef DEBUG
+    Serial.println("STARTUP");
+  #endif
   for(;;) {
-    const int center = 4;
-    const int cursorLength = 1;
-    static unsigned long lastTime = millis();
-    player1.loop();
+    player.loop();
+    player.printScroller(Board::Start);
 
-    // The player has lost the game
-    if (player1.getSunkenShips() == 5) {
-      #ifdef DEBUG
-        Serial.println("You lose");
-      #endif
-
-      player1.setSunkenShips(0);
-      player2.setSunkenShips(0);
-      incoming_request = false;
-      incoming_response = false;
-      incoming_isHit = false;
-      hasTurn = true;
-      success = false;
-
-      player1.clearBoard('e');
-      player1.clearBoard('m');
-
-      outgoing.winner = true; // Tells the other player to end the game
-      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+    // Once is pressed, the program continues with the setup of the ships
+    if (player.button.isPressed() || success) {
+      FastLED.clear();
+      player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
+      player.printBoard();
       break;
     }
 
-    // The player has won the game
-    if (winner) {
-      #ifdef DEBUG
-        Serial.println("You win");
-      #endif
-
-      player1.setSunkenShips(0);
-      player2.setSunkenShips(0);
-      player1.clearBoard('e');
-      player1.clearBoard('m');
-      break;
-    }
-
-    if (millis() - lastTime >= 1000) {
-      lastTime = millis();
-      #ifdef DEBUG
-        Serial.println("Sunken ships: " + String(player1.getSunkenShips()));
-        Serial.println("Has turn: " + String(hasTurn));
-      #endif
-    }
-
-    if (hasTurn) {
-      player1.setCursor('e', center, center, cursorLength, Horizontal, Board::Red);
-    } else {
-      player1.setCursor('e', center, center, cursorLength, Horizontal, Board::Blue);
-    }
-
-    // Send a hit to the other player
-    if (player1.button.isPressed() && hasTurn) {
-      hasTurn = false;
-
-      outgoing.x = player1.getCursorX();
-      outgoing.y = player1.getCursorY();
-      outgoing.request = true;
-      outgoing.response = false;
-      outgoing.isHit = false;
-      outgoing.hasTurn = true; // Give turn to the other player
-      outgoing.winner = false;
-      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-    }
-
-    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
-
-    // Hit recieved
-    if (incoming_request) {
-      printIncomingData();
-      incoming_request = false;
-      delay(2000);
-
-      // Return the coordinates of the hit and if it was a hit
-      outgoing.x = incoming_x;
-      outgoing.y = incoming_y;
-      outgoing.request = false;
-      outgoing.response = true;
-      outgoing.isHit = player1.hit(incoming_x, incoming_y);
-      outgoing.hasTurn = false;
-      outgoing.winner = false;
-      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-      Serial.println("Sent response");
-    }
-
-    // Response of a hit
-    if (incoming_response) {
-      incoming_response = false;
-      Serial.println("\nFrom response");
-      Serial.println("Is hit: " + String(incoming_isHit));
-      Serial.println("Hit on x: " + String(incoming_x) + ", y: " + String(incoming_y));
-      // Set the hit
-      if (incoming_isHit) {
-        Serial.println("Set red");
-        player1.setColor('e', incoming_x, incoming_y, Board::Red);
-      } else {
-        Serial.println("Set white");
-        player1.setColor('e', incoming_x, incoming_y, Board::White);
-      }
-      player1.resetMainColors();
-      player1.resetEnemyColors();
-    }
+    if (player.button.isPressed() && player.joystick.button.isPressed())
+      ESP.restart();
   }
 }
 
-void startup() {
+void endBanner() {
+  #ifdef DEBUG
+    Serial.println("END GAME");
+  #endif
+  resetBoard();
   for(;;) {
-    player1.loop();
-    player1.printScroller(1);
-
-    // Once is pressed, the program continues with the setup of the ships
-    if (player1.button.isPressed() || success) {
+    player.loop();
+    if (winner) {
+      player.printScroller(Board::Win);
+    } else {
+      player.printScroller(Board::Lose);
+    }
+    
+    if (player.button.isPressed() && player.joystick.button.isPressed())
+      ESP.restart();
+    
+    // Once is pressed, the game is restarted
+    if (player.button.isPressed()) {
       FastLED.clear();
-      player1.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
-      player1.printBoard();
+      player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
+      player.printBoard();
       break;
     }
-
-    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
-      
   }
 }
 
@@ -244,7 +183,7 @@ void chooseFirstPlayer() {
 
     if (incoming_request) {
       incoming_request = false;
-      delay(2000);
+      delay(RESPONSE_DELAY);
 
       outgoing.x = incoming_x;
       outgoing.y = incoming_y;
@@ -266,6 +205,83 @@ void chooseFirstPlayer() {
   }
 }
 
+void sendHits() {
+  winner = false; // There is no winner when the game starts
+  for(;;) {
+    player.loop();
+
+    if (isWinnerOrLoser()) break;
+    printDebugInfo();
+    printCursor();
+
+    // Send a hit to the other player
+    if (player.button.isPressed() && hasTurn) {
+      // TODO: init the enemy colors in the set cursor method
+      int currentColor = player.getColor('e', player.getCursorX(), player.getCursorY());
+      int red = Board::Red;
+      int condition = currentColor == red;
+      Serial.println("Current color: " + String(currentColor));
+      Serial.println("Red: " + String(red));
+      Serial.println("Condition: " + String(condition));
+
+      // if (player.getColor('e', player.getCursorX(), player.getCursorY()) != Board::Red) {
+      //   continue;
+      // }
+
+      hasTurn = false;
+
+      outgoing.x = player.getCursorX();
+      outgoing.y = player.getCursorY();
+      outgoing.request = true;
+      outgoing.response = false;
+      outgoing.isHit = false;
+      outgoing.hasTurn = true; // Give turn to the other player
+      outgoing.winner = false;
+
+      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+    }
+
+    if (player.button.isPressed() && player.joystick.button.isPressed())
+      ESP.restart();
+
+    // Hit recieved
+    if (incoming_request) {
+      printIncomingData();
+      incoming_request = false;
+      delay(RESPONSE_DELAY);
+
+      // Return the coordinates of the hit and if it was a hit
+      outgoing.x = incoming_x;
+      outgoing.y = incoming_y;
+      outgoing.request = false;
+      outgoing.response = true;
+      outgoing.isHit = player.hit(incoming_x, incoming_y);
+      outgoing.hasTurn = false;
+      outgoing.winner = false;
+      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+      Serial.println("Sent response");
+    }
+
+    // Response of a hit
+    if (incoming_response) {
+      incoming_response = false;
+      Serial.println("\nFrom response");
+      Serial.println("Is hit: " + String(incoming_isHit));
+      Serial.println("Hit on x: " + String(incoming_x) + ", y: " + String(incoming_y));
+      // Set the hit
+      if (incoming_isHit) {
+        Serial.println("Set red");
+        player.setColor('e', incoming_x, incoming_y, Board::Red);
+      } else {
+        Serial.println("Set white");
+        player.setColor('e', incoming_x, incoming_y, Board::White);
+      }
+      player.resetMainColors();
+      player.resetEnemyColors();
+    }
+  }
+}
+
 void setupShips() {
   Serial.println("PLACING SHIPS");
   printIncomingData();
@@ -278,64 +294,79 @@ void setupShips() {
 
 void placeShip(int length) {
   int orientation = Horizontal;
-  int center = 4;
   int startX, startY, endX, endY;
 
   for (;;) {
-    player1.loop();
-    player1.setCursor('m', center, center, length, orientation, Board::Red);
+    player.loop();
+    player.setCursor('m', BOARD_CENTER, BOARD_CENTER, length, orientation, Board::Red);
 
     // Toggle orientation
-    if (player1.joystick.button.isPressed()) {
+    if (player.joystick.button.isPressed()) {
       orientation = orientation == Vertical ? Horizontal : Vertical;
     }
 
-    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
+    if (player.button.isPressed() && player.joystick.button.isPressed())
+      ESP.restart();
 
     // Place ship
-    if (player1.button.isPressed()) {
+    if (player.button.isPressed()) {
       if (orientation == Horizontal) {
-        startX = player1.getCursorX();
-        endX = player1.getCursorX() + (length - 1);
-        startY = endY = player1.getCursorY();
+        startX = player.getCursorX();
+        endX = player.getCursorX() + (length - 1);
+        startY = endY = player.getCursorY();
       } else {
-        startX = endX = player1.getCursorX();
-        startY = player1.getCursorY();
-        endY = player1.getCursorY() + (length - 1);
+        startX = endX = player.getCursorX();
+        startY = player.getCursorY();
+        endY = player.getCursorY() + (length - 1);
       }
 
       // If the ship can be created, place it on the board
-      if (player1.createShip(startX, startY, endX, endY)) {
-        player1.placeShip(player1.getShip(player1.getShipsList().size() - 1));
-        player1.printBoard();
-        player1.resetMainColors();
+      if (player.createShip(startX, startY, endX, endY)) {
+        player.placeShip(player.getShip(player.getShipsList().size() - 1));
+        player.printBoard();
+        player.resetMainColors();
         break;
       }
     }
   }
 }
 
-void endBanner() {
-  #ifdef DEBUG
-    Serial.println("END GAME");
-  #endif
-  for(;;) {
-    player1.loop();
-    if (winner) {
-      player1.printScroller(Board::Win);
-    } else {
-      player1.printScroller(Board::Lose);
-    }
-    
-    if (player1.button.isPressed() && player1.joystick.button.isPressed())ESP.restart();
-    
-    // Once is pressed, the program continues with the setup of the ships
-    if (player1.button.isPressed()) {
-      FastLED.clear();
-      player1.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
-      player1.printBoard();
-      break;
-    }
+bool isWinnerOrLoser() {
+  // The player has lost the game
+  if (player.getSunkenShips() == player.getShipsList().size()) {
+    resetGameVariables(true);
+    outgoing.winner = true; // Tells the other player to end the game
+    esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+    return true;
+  }
+
+  // The player has won the game
+  if (winner) {
+    resetGameVariables(false);
+    return true;
+  }
+
+  return false;
+}
+
+void printDebugInfo() {
+  static unsigned long lastTime = millis();
+
+  if (millis() - lastTime >= 3000) {
+    lastTime = millis();
+    #ifdef DEBUG
+      Serial.println("Number of ships: " + String(player.getShipsList().size()));
+      Serial.println("Sunken ships: " + String(player.getSunkenShips()));
+      Serial.println("Has turn: " + String(hasTurn ? "true" : "false"));
+    #endif
+  }
+}
+
+void printCursor() {
+  if (hasTurn) {
+    player.setCursor('e', BOARD_CENTER, BOARD_CENTER, CURSOR_LENGTH, Horizontal, CURSOR_COLOR);
+  } else {
+    player.setCursor('e', BOARD_CENTER, BOARD_CENTER, CURSOR_LENGTH, Horizontal, Board::Blue);
   }
 }
 
@@ -372,4 +403,25 @@ void printIncomingData() {
     Serial.println("hasTurn: " + String(hasTurn));
     Serial.println("success: " + String(success));
   #endif
+}
+
+void resetGameVariables(bool turn) {
+  player.setSunkenShips(0);
+  incoming_x = 0;
+  incoming_y = 0;
+  incoming_request = false;
+  incoming_response = false;
+  incoming_isHit = false;
+  hasTurn = turn;
+  success = false;
+
+  resetBoard();
+}
+
+void resetBoard() {
+  player.clearBoard('e');
+  player.clearBoard('m');
+  player.resetMainColors();
+  player.resetEnemyColors();
+  player.printBoard();
 }

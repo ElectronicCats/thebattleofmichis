@@ -65,6 +65,10 @@ int Player::getSunkenShips() {
 
 void Player::setSunkenShips(int sunkenShips) {
   this->sunkenShips = sunkenShips;
+
+  if (sunkenShips == 0) {
+    this->ships.clear();
+  }
 }
 
 bool Player::createShip(int startX, int startY, int endX, int endY) {
@@ -129,7 +133,7 @@ void Player::setCursor(char id, int x, int y, int length, int orientation, int c
         if (y_t < 8) y_t++;
         break;
       case 4:
-        break;  
+        break;
     }
     // Update the cursor position
     this->board.setCursor(id, x_t, y_t, length, orientation, color);
@@ -138,6 +142,11 @@ void Player::setCursor(char id, int x, int y, int length, int orientation, int c
 
 int Player::getCursorX() {
   return this->board.getCursorX();
+}
+
+int Player::getColor(char id, int x, int y) {
+  return this->board.getPixel(id, x, y);
+  // return this->board.getColor(id, x, y);
 }
 
 void Player::setColor(char id, int x, int y, int color) {

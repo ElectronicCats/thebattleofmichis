@@ -2,17 +2,18 @@
 #include "Ship.h"
 #include <FastLED.h>
 #include <vector>
+#include "Color.h"
 
 #include <LEDMatrix.h>    // https://github.com/AaronLiddiment/LEDMatrix.git
 #include <LEDSprites.h>   // https://github.com/AaronLiddiment/LEDSprites.git
 
-#define CUSTOM_BOARD      true // true -> Electronic Cats board, false -> CJMCU-64 board
+#define CUSTOM_BOARD      false // true -> Electronic Cats board, false -> CJMCU-64 board
 #define PIN_MATRIX_1      16
 #define PIN_MATRIX_2      17
 #define COLOR_ORDER       GRB // GRB ordering is typical for the WS2812B chipset
 #define CHIPSET           WS2812B
 
-#define BRIGHTNESS        50
+#define BRIGHTNESS        3
 #define CURSOR_DELAY_TIME 200 // Miliseconds
 
 #define SHAPE_WIDTH       8
@@ -35,7 +36,7 @@ class Board {
     int **main;
     int **enemy;
     Board(int rows, int cols);
-    enum Color { Blue = 0, Green = 1, White = 2, Red = 3 };
+    enum OldColor { Blue = 0, Green = 1, White = 2, Red = 3 };
     enum Orientation { Horizontal = 0, Vertical = 1 };
     enum State { Start = 1, Setup = 2, Win = 3, Lose = 4 };
     void print(int state);
@@ -49,6 +50,7 @@ class Board {
     void resetMainColors();
     int getPixel(char id, int x, int y);
     void setPixel(char id, int x, int y, int value);
+    int getColor(char id, int x, int y);
     void clear(char id);
     void setHorizontalLine(char id, int x, int y, int length, int color);
     void setVerticalLine(char id, int x, int y, int length, int color);
