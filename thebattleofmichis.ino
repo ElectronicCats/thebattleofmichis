@@ -27,7 +27,7 @@ uint8_t incoming_y;
 bool incoming_request = false;
 bool incoming_response = false;
 bool incoming_isHit = false;
-bool hasTurn = true;
+bool hasTurn = false;
 bool winner = false;
 
 typedef struct message {
@@ -60,6 +60,9 @@ void placeShip(int length);
 bool isWinnerOrLoser();
 void printDebugInfo();
 void printCursor();
+void requestHit();
+void sendResponse();
+void setHit();
 
 void setup() {
   Serial.begin(115200);
@@ -216,77 +219,29 @@ void sendHits() {
 
     // Send a hit to the other player
     if (player.button.isPressed() && hasTurn) {
-      // TODO: init the enemy colors in the set cursor method
-      int currentColor = player.getColor('e', player.getCursorX(), player.getCursorY());
-      int red = Board::Red;
-      int condition = currentColor == red;
-      Serial.println("Current color: " + String(currentColor));
-      Serial.println("Red: " + String(red));
-      Serial.println("Condition: " + String(condition));
-
-      // if (player.getColor('e', player.getCursorX(), player.getCursorY()) != Board::Red) {
-      //   continue;
-      // }
-
-      hasTurn = false;
-
-      outgoing.x = player.getCursorX();
-      outgoing.y = player.getCursorY();
-      outgoing.request = true;
-      outgoing.response = false;
-      outgoing.isHit = false;
-      outgoing.hasTurn = true; // Give turn to the other player
-      outgoing.winner = false;
-
-      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+      requestHit();
     }
-
-    if (player.button.isPressed() && player.joystick.button.isPressed())
-      ESP.restart();
 
     // Hit recieved
     if (incoming_request) {
-      printIncomingData();
-      incoming_request = false;
-      delay(RESPONSE_DELAY);
-
-      // Return the coordinates of the hit and if it was a hit
-      outgoing.x = incoming_x;
-      outgoing.y = incoming_y;
-      outgoing.request = false;
-      outgoing.response = true;
-      outgoing.isHit = player.hit(incoming_x, incoming_y);
-      outgoing.hasTurn = false;
-      outgoing.winner = false;
-      esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-      Serial.println("Sent response");
+      sendResponse();
     }
 
     // Response of a hit
     if (incoming_response) {
-      incoming_response = false;
-      Serial.println("\nFrom response");
-      Serial.println("Is hit: " + String(incoming_isHit));
-      Serial.println("Hit on x: " + String(incoming_x) + ", y: " + String(incoming_y));
-      // Set the hit
-      if (incoming_isHit) {
-        Serial.println("Set red");
-        player.setColor('e', incoming_x, incoming_y, Board::Red);
-      } else {
-        Serial.println("Set white");
-        player.setColor('e', incoming_x, incoming_y, Board::White);
-      }
-      player.resetMainColors();
-      player.resetEnemyColors();
+      setHit();
     }
+
+    if (player.button.isPressed() && player.joystick.button.isPressed())
+      ESP.restart();
   }
 }
 
 void setupShips() {
   Serial.println("PLACING SHIPS");
   printIncomingData();
-  placeShip(2); // Destroyer
-  placeShip(3); // Submarine
+  // placeShip(2); // Destroyer
+  // placeShip(3); // Submarine
   placeShip(3); // Cruiser
   placeShip(4); // Battleship
   placeShip(5); // Aircraft Carrier
@@ -331,6 +286,8 @@ void placeShip(int length) {
   }
 }
 
+/// @brief Returns true if the game is over
+/// @return bool
 bool isWinnerOrLoser() {
   // The player has lost the game
   if (player.getSunkenShips() == player.getShipsList().size()) {
@@ -368,6 +325,73 @@ void printCursor() {
   } else {
     player.setCursor('e', BOARD_CENTER, BOARD_CENTER, CURSOR_LENGTH, Horizontal, Board::Blue);
   }
+}
+
+void requestHit() {
+  // TODO: init the enemy colors in the set cursor method
+  int currentColor = player.getColor('e', player.getCursorX(), player.getCursorY());
+  int red = Board::Red;
+  int condition = currentColor == red;
+  #ifdef DEBUG
+    Serial.println("Send hit request");
+    Serial.println("Current color: " + String(currentColor));
+    Serial.println("Red: " + String(red));
+    Serial.println("Condition: " + String(condition));
+  #endif
+
+  // if (player.getColor('e', player.getCursorX(), player.getCursorY()) != Board::Red) {
+  //   continue;
+  // }
+
+  hasTurn = false;
+
+  outgoing.x = player.getCursorX();
+  outgoing.y = player.getCursorY();
+  outgoing.request = true;
+  outgoing.response = false;
+  outgoing.isHit = false;
+  outgoing.hasTurn = true; // Give turn to the other player
+  outgoing.winner = false;
+
+  esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+}
+
+void sendResponse() {
+  // TODO: If the hit is a hit, the player has another turn
+  printIncomingData();
+  incoming_request = false;
+  delay(RESPONSE_DELAY);
+
+  // Return the coordinates of the hit and if it was a hit
+  outgoing.x = incoming_x;
+  outgoing.y = incoming_y;
+  outgoing.request = false;
+  outgoing.response = true;
+  outgoing.isHit = player.hit(incoming_x, incoming_y);
+  outgoing.hasTurn = false;
+  outgoing.winner = false;
+  esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
+  #ifdef DEBUG
+    Serial.println("Sent response");
+  #endif
+}
+
+void setHit() {
+  incoming_response = false;
+  #ifdef DEBUG
+    Serial.println("\nFrom response");
+    Serial.println("Is hit: " + String(incoming_isHit));
+    Serial.println("Hit on x: " + String(incoming_x) + ", y: " + String(incoming_y));
+  #endif
+
+  // Set the hit
+  if (incoming_isHit) {
+    player.setColor('e', incoming_x, incoming_y, Board::Red);
+  } else {
+    player.setColor('e', incoming_x, incoming_y, Board::White);
+  }
+  player.resetMainColors();
+  player.resetEnemyColors();
 }
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
