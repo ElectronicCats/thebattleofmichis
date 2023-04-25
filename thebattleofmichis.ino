@@ -27,7 +27,7 @@ uint8_t incoming_y;
 bool incoming_request = false;
 bool incoming_response = false;
 bool incoming_isHit = false;
-bool hasTurn = false;
+bool hasTurn = true;
 bool winner = false;
 
 typedef struct message {
@@ -323,7 +323,7 @@ void printCursor() {
   if (hasTurn) {
     player.setCursor('e', BOARD_CENTER, BOARD_CENTER, CURSOR_LENGTH, Horizontal, CURSOR_COLOR);
   } else {
-    player.setCursor('e', BOARD_CENTER, BOARD_CENTER, CURSOR_LENGTH, Horizontal, Board::Blue);
+    player.printBoard();
   }
 }
 
