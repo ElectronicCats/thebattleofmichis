@@ -27,7 +27,7 @@ uint8_t incoming_y;
 bool incoming_request = false;
 bool incoming_response = false;
 bool incoming_isHit = false;
-bool hasTurn = true;
+bool hasTurn = false;
 bool winner = false;
 
 typedef struct message {
@@ -52,10 +52,10 @@ esp_now_peer_info_t peerInfo;
 bool success;
 
 void startup();
-void endBanner();
 void chooseFirstPlayer();
-void sendHits();
 void setupShips();
+void sendHits();
+void endBanner();
 void placeShip(int length);
 bool isWinnerOrLoser();
 void printDebugInfo();
@@ -63,6 +63,9 @@ void printCursor();
 void requestHit();
 void sendResponse();
 void setHit();
+void printIncomingData();
+void resetGameVariables(bool turn);
+void resetBoard();
 
 void setup() {
   Serial.begin(115200);
@@ -131,32 +134,6 @@ void startup() {
   }
 }
 
-void endBanner() {
-  #ifdef DEBUG
-    Serial.println("END GAME");
-  #endif
-  resetBoard();
-  for(;;) {
-    player.loop();
-    if (winner) {
-      player.printScroller(Board::Win);
-    } else {
-      player.printScroller(Board::Lose);
-    }
-    
-    if (player.button.isPressed() && player.joystick.button.isPressed())
-      ESP.restart();
-    
-    // Once is pressed, the game is restarted
-    if (player.button.isPressed()) {
-      FastLED.clear();
-      player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
-      player.printBoard();
-      break;
-    }
-  }
-}
-
 void chooseFirstPlayer() {
   Serial.println("CHOOSING THE FIRST PLAYER");
   for(;;) {
@@ -208,6 +185,16 @@ void chooseFirstPlayer() {
   }
 }
 
+void setupShips() {
+  Serial.println("PLACING SHIPS");
+  printIncomingData();
+  // placeShip(2); // Destroyer
+  // placeShip(3); // Submarine
+  placeShip(3); // Cruiser
+  placeShip(4); // Battleship
+  placeShip(5); // Aircraft Carrier
+}
+
 void sendHits() {
   winner = false; // There is no winner when the game starts
   for(;;) {
@@ -237,14 +224,30 @@ void sendHits() {
   }
 }
 
-void setupShips() {
-  Serial.println("PLACING SHIPS");
-  printIncomingData();
-  // placeShip(2); // Destroyer
-  // placeShip(3); // Submarine
-  placeShip(3); // Cruiser
-  placeShip(4); // Battleship
-  placeShip(5); // Aircraft Carrier
+void endBanner() {
+  #ifdef DEBUG
+    Serial.println("END GAME");
+  #endif
+  resetBoard();
+  for(;;) {
+    player.loop();
+    if (winner) {
+      player.printScroller(Board::Win);
+    } else {
+      player.printScroller(Board::Lose);
+    }
+    
+    if (player.button.isPressed() && player.joystick.button.isPressed())
+      ESP.restart();
+    
+    // Once is pressed, the game is restarted
+    if (player.button.isPressed()) {
+      FastLED.clear();
+      player.resetEnemyColors(); // I tried this to stop the scroller animation but it didn't work
+      player.printBoard();
+      break;
+    }
+  }
 }
 
 void placeShip(int length) {
@@ -415,6 +418,7 @@ void printIncomingData() {
 
 void resetGameVariables(bool turn) {
   player.setSunkenShips(0);
+  player.clearHitsList();
   incoming_x = 0;
   incoming_y = 0;
   incoming_request = false;
