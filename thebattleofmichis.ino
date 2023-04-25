@@ -328,20 +328,9 @@ void printCursor() {
 }
 
 void requestHit() {
-  // TODO: init the enemy colors in the set cursor method
-  int currentColor = player.getColor('e', player.getCursorX(), player.getCursorY());
-  int red = Board::Red;
-  int condition = currentColor == red;
-  #ifdef DEBUG
-    Serial.println("Send hit request");
-    Serial.println("Current color: " + String(currentColor));
-    Serial.println("Red: " + String(red));
-    Serial.println("Condition: " + String(condition));
-  #endif
-
-  // if (player.getColor('e', player.getCursorX(), player.getCursorY()) != Board::Red) {
-  //   continue;
-  // }
+  if (!player.isValidHit(player.getCursorX(), player.getCursorY())) {
+    return;
+  }
 
   hasTurn = false;
 
@@ -371,20 +360,15 @@ void sendResponse() {
   outgoing.hasTurn = false;
   outgoing.winner = false;
   esp_err_t result = esp_now_send(newMacAddress, (uint8_t *) &outgoing, sizeof(outgoing));
-  #ifdef DEBUG
-    Serial.println("Sent response");
-  #endif
 }
 
 void setHit() {
   incoming_response = false;
-  #ifdef DEBUG
-    Serial.println("\nFrom response");
-    Serial.println("Is hit: " + String(incoming_isHit));
-    Serial.println("Hit on x: " + String(incoming_x) + ", y: " + String(incoming_y));
-  #endif
 
   // Set the hit
+  Coordinate hit(incoming_x, incoming_y);
+  player.setHitToList(hit);
+
   if (incoming_isHit) {
     player.setColor('e', incoming_x, incoming_y, Board::Red);
   } else {
