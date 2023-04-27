@@ -110,6 +110,27 @@ std::vector<Ship> Player::getShipsList() {
   return ships;
 }
 
+std::vector<Coordinate> Player::getHitsList() {
+  return this->hitsList;
+}
+
+void Player::setHitToList(Coordinate hit) {
+  this->hitsList.push_back(hit);
+}
+
+void Player::clearHitsList() {
+  this->hitsList.clear();
+}
+
+bool Player::isValidHit(int x, int y) {
+  for (auto hit : this->hitsList) {
+    if (hit.getX() == x && hit.getY() == y) {
+      return false;
+    }
+  }
+  return true;
+}
+
 void Player::setCursor(char id, int x, int y, int length, int orientation, int color) {
   static int x_t = x;
   static int y_t = y;
