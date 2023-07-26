@@ -1,24 +1,23 @@
-#include "Board.h"
+#include <FastLED.h>
 
-cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> mainBoardUp;
-cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> enemyBoardUp;
+#include <LEDMatrix.h>
+#include <LEDSprites.h>
 
-const uint8_t SpriteBoardData[] = {
-  0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
-  0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10,
-  0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,
-  0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x20,
-  0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,
-  0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,0x30,
-  0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,
-  0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F,0x40
-};
+// Change the next 6 defines to match your matrix type and size
 
-struct CRGB MainSpriteBoardCols[64];
-struct CRGB EnemySpriteBoardCols[64];
+#define LED_PIN        4
+#define COLOR_ORDER    RGB
+#define CHIPSET        WS2812B
 
-cSprite MainSpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, MainSpriteBoardCols);
-cSprite EnemySpriteBoard(8, 8, SpriteBoardData, 1, _8BIT, EnemySpriteBoardCols);
+#define MATRIX_WIDTH   -8
+#define MATRIX_HEIGHT  8
+#define MATRIX_TYPE    VERTICAL_ZIGZAG_MATRIX
+
+cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> leds;
+
+#define SHAPE_WIDTH    224
+#define SHAPE_HEIGHT   8
+
 
 const uint8_t SpriteopenData[] = {
   B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000001),B8_4BIT(11200000),B8_4BIT(00000000),B8_4BIT(00333000),B8_4BIT(00333000),B8_4BIT(00000000),B8_4BIT(44444000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00044000),B8_4BIT(44000000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000000),B8_4BIT(00000500),B8_4BIT(00005000),B8_4BIT(00000000),B8_4BIT(10000011),B8_4BIT(12100100),B8_4BIT(00000000),B8_4BIT(00000000),
@@ -68,314 +67,34 @@ const uint8_t SpritesetupData[] = {
 const struct CRGB SpritesetupCols[7] = { CRGB(255,255,255), CRGB(254,255,0), CRGB(0,169,255), CRGB(170,170,170), CRGB(85,85,85), CRGB(0,0,0), CRGB(0,0,0) };
 cSprite Spritesetup(160, 8, SpritesetupData, 1, _3BIT, SpritesetupCols);
 
-cLEDSprites MainSprites(&mainBoardUp);
-cLEDSprites EnemySprites(&enemyBoardUp);
 
-Board::Board(int rows, int cols) {
-  this->rows = rows;
-  this->cols = cols;
-  this->main = new int*[rows];
-  this->enemy = new int*[rows];
-  this->cursorX = 0;
-  this->cursorY = 0;
 
-  // Create the main board
-  for (int row = 0; row < rows; row++) {
-    main[row] = new int[cols];
-  }
+cLEDSprites Sprites(&leds);
 
-  // Create the enemy board
-  for (int row = 0; row < rows; row++) {
-    enemy[row] = new int[cols];
-  }
 
-  Board::clear('m');
+
+void setup()
+{
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds[0], leds.Size());
+  FastLED.setBrightness(8);
+  Sprites.AddSprite(&Spriteopen);
+  //Sprites.AddSprite(&Spriteyoulose);
+  //Sprites.AddSprite(&Spriteyouwin);
 }
 
-// Print the matrix on the serial monitor
-void Board::serialPrint(int **matrix) {
-  Serial.print("  |");
-  for (int i = 1; i <= cols; i++) {
-      Serial.print(" ");
-      Serial.print(i);
-      Serial.print(" |");
-  }
-  Serial.println("\n  --------------------------------------");
+void loop()
+{
 
-  for (int row = 0; row < rows; row++) {
-    Serial.print((char)('A' + row % 26)); // Increase the letter -> A, B, C, ...
-    Serial.print(" |");
-    for (int col = 0; col < cols; col++) {
-        Serial.print(" ");
-        Serial.print(matrix[row][col]);
-        Serial.print(" |");
-    }
-    Serial.println();
-    Serial.print("  ");
-    for (int i = 0; i <= cols; i++) {
-        Serial.print("---");
-    }
-    Serial.println("--------");
-  }
-  Serial.println("");
-}
 
-// Print the matrix on the LED matrix
-void Board::print(int state) {
-  static unsigned long lastTime = millis();
-  if (millis() - lastTime > 3000) {
-    lastTime = millis();
-    // Board::serialPrint(main);
-  }
-  // Board::serialPrint(enemy);
-
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_1, COLOR_ORDER>(mainBoardUp[0], mainBoardUp.Size());
-  FastLED.addLeds<CHIPSET, PIN_MATRIX_2, COLOR_ORDER>(enemyBoardUp[0], enemyBoardUp.Size());
-  FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear();
-  
-  MainSprites.AddSprite(&MainSpriteBoard);
+  Spriteopen.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
 
-  if(state)
-    EnemySprites.AddSprite(&EnemySpriteBoard);
-  
-  Board::illuminate('m', main);
-  Board::illuminate('e', enemy);
-}
+  for(int i = 0; i < SHAPE_WIDTH; i++){
+    FastLED.clear();
+    Sprites.UpdateSprites();
+    Sprites.RenderSprites();
+    FastLED.show();
+    delay(50);
+  }  
 
-// LED banner test
-void Board::scroller(int id) {
-  static int counter = 0;
-  static unsigned long lastTime = millis();
-
-  if (millis() - lastTime > 100) {
-    // Serial.println("Counter: " + String(counter));
-    lastTime = millis();
-    counter++;
- 
-    Board::print(0);    
-    
-    if (counter > 105) {
-      counter = 0;
-    }
-  }
-
-  if (counter == 0) {
-
-    if(id == 1){
-      EnemySprites.AddSprite(&Spriteopen);
-      EnemySprites.ChangePriority(&Spriteopen, SPR_FRONT);
-      Spriteopen.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-    }
-    else if(id == 2) {
-         EnemySprites.AddSprite(&Spritesetup);
-         EnemySprites.ChangePriority(&Spritesetup, SPR_FRONT);
-         Spritesetup.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-    }
-    else if(id == 3) {
-         EnemySprites.AddSprite(&Spriteyouwin);
-         EnemySprites.ChangePriority(&Spriteyouwin, SPR_FRONT);
-         Spriteyouwin.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-    }
-    else if(id == 4) {
-         EnemySprites.AddSprite(&Spriteyoulose);
-         EnemySprites.ChangePriority(&Spriteyoulose, SPR_FRONT);
-         Spriteyoulose.SetPositionFrameMotionOptions(0/*X*/, 0/*Y*/, 0/*Frame*/, 0/*FrameRate*/, -1/*XChange*/, 1/*XRate*/, 0/*YChange*/, 1/*YRate*/, SPRITE_X_KEEPIN | SPRITE_Y_KEEPIN);
-    }
-  } 
-}
-
-// Fill the board with the colors
-void Board::illuminate(char id, int **matrix) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      int color = matrix[i][j];
-      if (color == Color::Blue) {
-        if (id == 'm') {
-          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
-        } else if (id == 'e') {
-          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Blue;
-        }
-      } else if (color == Color::Green) {
-        if (id == 'm') {
-          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
-        } else if (id == 'e') {
-          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Green;
-        }
-      } else if (color == Color::White) {
-        if (id == 'm') {
-          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
-        } else if (id == 'e') {
-          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::White;
-        }
-      } else if (color == Color::Red) {
-        if (id == 'm') {
-          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
-        } else if (id == 'e') {
-          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Red;
-        }
-      } else if (color == Color::Yellow) {
-        if (id == 'm') {
-          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Yellow;
-        } else if (id == 'e') {
-          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Yellow;
-        }
-      } else if (color == Color::Orange) {
-        if (id == 'm') {
-          MainSpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Orange;
-        } else if (id == 'e') {
-          EnemySpriteBoardCols[SHAPE_WIDTH * i + j] = CRGB::Orange;
-        }
-      }
-    }
-  }
-  FastLED.clear();
-  MainSprites.UpdateSprites();
-  MainSprites.RenderSprites();
-  EnemySprites.UpdateSprites();
-  EnemySprites.RenderSprites();
-  FastLED.show();
-}
-
-/**
-  * Takes an object of type Ship and and change the values
-  * of the coordinates from zero to one on the board
-  */
-
-void Board::placeShip(Ship ship) {
-  for (int row = ship.getStartY(); row <= ship.getEndY(); row++) {
-    for (int col = ship.getStartX(); col <= ship.getEndX(); col++) {
-      main[row][col] = Color::Green;
-    }
-  }
-}
-
-void Board::setCursor(char id, int x, int y, int length, int orientation, int color) {
-  static int x_t = x;
-  static int y_t = y;
-  static int orientation_t = orientation;
-  // TODO: init the enemy colors vector
-
-  // Validates if the line can be displayed, if not, it will be displayed in the last position
-  if (!(x >= 0 && x <= SHAPE_WIDTH - length) && orientation_t == Horizontal) {
-    x = SHAPE_WIDTH - length + 1;
-  }
-  if (!(y >= 0 && y <= SHAPE_HEIGHT - length) && orientation_t == Vertical) {
-    y = SHAPE_HEIGHT - length + 1;
-  }
-
-  // Update the global variables
-  cursorX = x;
-  cursorY = y;
-
-  // Backup the current colors of the board
-  if (mainColors.size() == 0) {
-    mainColors.reserve(SHAPE_WIDTH * SHAPE_HEIGHT); // reserve memory for all pixels
-
-    for (int i = 1; i <= rows; i++) {
-      for (int j = 1; j <= cols; j++) {
-        mainColors.push_back(Board::getPixel(id, i, j));
-      }
-    }
-  }
-
-  // If the cursor has moved, or the orientation has changed
-  if (x != x_t || y != y_t || orientation != orientation_t) {
-    // Restore the previous colors
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        int index = i * cols + j;
-        Board::setPixel(id, i + 1, j + 1, mainColors[index]);
-      }
-    }
-
-    // Update the variables
-    x_t = x;
-    y_t = y;
-    cursorX = x;
-    cursorY = y;
-    orientation_t = orientation;
-  }
-
-  // Display the cursor
-  if (orientation_t == Horizontal) {
-    Board::setHorizontalLine(id, x_t, y_t, length, color);
-  } else if (orientation_t == Vertical) {
-    Board::setVerticalLine(id, x_t, y_t, length, color);
-  }
-
-  Board::print(1);
-}
-
-void Board::clear(char id) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      Board::setPixel(id, i + 1, j + 1, Color::Blue);
-    }
-  }
-  id == 'm' ? mainColors.clear() : enemyColors.clear();
-
-  // Fill the main board with 0
-  for (int row = 0; row < rows; row++) {
-    for (int col = 0; col < cols; col++) {
-      main[row][col] = 0;
-    }
-  }
-
-  // Fill the enemy board with 0
-  for (int row = 0; row < rows; row++) {
-    for (int col = 0; col < cols; col++) {
-      enemy[row][col] = 0;
-    }
-  }
-}
-
-int Board::getCursorX() {
-  return cursorX;
-}
-
-int Board::getCursorY() {
-  return cursorY;
-}
-
-void Board::resetEnemyColors() {
-  enemyColors.clear();
-}
-
-void Board::resetMainColors() {
-  mainColors.clear();
-}
-
-// id = 'm' for main board, 'e' for enemy board
-int Board::getPixel(char id, int x, int y) {
-  return id == 'm' ? main[y - 1][x - 1] : enemy[y - 1][x - 1];
-}
-
-void Board::setPixel(char id, int x, int y, int color) {
-  int index = x * cols + y;
-  id == 'm' ? main[y - 1][x - 1] = color : enemy[y - 1][x - 1] = color;
-  // id == 'm' ? mainColors[index] = color : enemyColors[index] = color;
-}
-
-int Board::getColor(char id, int x, int y) {
-  int index = x * cols + y;
-  return id == 'm' ? mainColors[index] : enemyColors[index];
-}
-
-void Board::setHorizontalLine(char id, int x, int y, int length, int color) {
-  for (int i = 0; i < length; i++) {
-    int x_t = x + i;
-    if (x_t >= 0 && x_t <= SHAPE_WIDTH) {
-      Board::setPixel(id, x_t, y, color);
-    }
-  }
-}
-
-void Board::setVerticalLine(char id, int x, int y, int length, int color) {
-  for (int i = 0; i < length; i++) {
-    int y_t = y + i;
-    if (y_t >= 0 && y_t <= SHAPE_HEIGHT) {
-      Board::setPixel(id, x, y_t, color);
-    }
-  }
 }
